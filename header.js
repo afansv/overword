@@ -14,7 +14,6 @@
 // @grant        GM_addValueChangeListener
 // @grant        unsafeWindow
 // @require      https://github.com/PRO-2684/GM_config/releases/download/v1.2.1/config.min.js#md5=525526b8f0b6b8606cedf08c651163c2
-// @require      https://cdn.jsdelivr.net/combine/npm/@violentmonkey/dom@2,npm/@violentmonkey/ui@0.7
 // ==/UserScript==
 
 
