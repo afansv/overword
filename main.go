@@ -7,8 +7,15 @@ import (
 	"github.com/gopherjs/gopherjs/js"
 )
 
+type WordSet struct {
+	Name            string   `json:"name"`
+	Words           []string `json:"words"`
+	BackgroundColor string   `json:"backgroundColor"`
+	TextColor       string   `json:"textColor"`
+}
+
 type Config struct {
-	Words          []string
+	WordSets       []WordSet
 	HighlightClass string
 	DebounceTime   int
 }
@@ -21,35 +28,94 @@ type Highlighter struct {
 
 var highlighter *Highlighter
 
-func main() {
-	js.Global.Set("initHighlighter", initHighlighter)
-	js.Global.Set("stopHighlighter", stopHighlighter)
-	js.Global.Call("initHighlighter") // запуск по умолчанию
+var (
+	unsafeWindow *js.Object
+	console      *js.Object
+	gmConfig     *js.Object
+)
+
+func consoleLog(args ...interface{}) {
+	console.Call("log", args...)
 }
 
-func initHighlighter(wordsObj *js.Object) {
-	var words []string
-	if wordsObj != nil && wordsObj != js.Undefined {
-		for i := 0; i < wordsObj.Length(); i++ {
-			word := wordsObj.Index(i).String()
-			if word != "" {
-				words = append(words, word)
-			}
-		}
-	}
-	if len(words) == 0 {
-		words = []string{"важно", "срочно", "внимание"}
-	}
+func main() {
+	console = js.Global.Get("console")
+	unsafeWindow = js.Global.Get("unsafeWindow")
+	gmConfig = unsafeWindow.Get("GM_config")
+
+	js.Global.Set("initHighlighter", initHighlighter)
+	js.Global.Set("stopHighlighter", stopHighlighter)
+	js.Global.Call("initHighlighter")
+}
+
+func initHighlighter() {
+	//{
+	//	slotFactory := func(i int) map[string]interface{} {
+	//		return map[string]interface{}{
+	//			"name": "Список слов " + strconv.Itoa(i),
+	//			"type": "folder",
+	//			"items": map[string]interface{}{
+	//				"name": map[string]interface{}{
+	//					"name": "Название",
+	//					"type": "str",
+	//				},
+	//				"words": map[string]interface{}{
+	//					"name": "Слова",
+	//					"type": "str",
+	//				},
+	//				"backgroundColor": map[string]interface{}{
+	//					"name": "Цвет фона",
+	//					"type": "folder",
+	//					"items": map[string]interface{}{
+	//						"green": map[string]interface{}{
+	//							"name": "Зеленый",
+	//							"type": "action",
+	//						},
+	//						"red": map[string]interface{}{
+	//							"name": "Красный",
+	//							"type": "action",
+	//						},
+	//					},
+	//				},
+	//				"textColor": map[string]interface{}{
+	//					"name":    "Цвет текста",
+	//					"type":    "enum",
+	//					"options": []string{"black", "white"},
+	//				},
+	//			},
+	//		}
+	//	}
+	//	gmConfig.New(map[string]interface{}{
+	//		"slot_1": slotFactory(1),
+	//		"slot_2": slotFactory(2),
+	//		"slot_3": slotFactory(3),
+	//		"slot_4": slotFactory(4),
+	//		"slot_5": slotFactory(5),
+	//	})
+	//}
 
 	config := Config{
-		Words:          words,
+		WordSets: []WordSet{
+			{
+				Name:            "urgent",
+				TextColor:       "black",
+				BackgroundColor: "yellow",
+				Words:           []string{"важно", "срочно", "внимание"},
+			},
+			{
+				Name:            "adult",
+				TextColor:       "white",
+				BackgroundColor: "red",
+				Words:           []string{"хуй", "хуё", "пизд", "бля"},
+			},
+		},
 		HighlightClass: "highlightClass",
 		DebounceTime:   1000,
 	}
 
 	highlighter = &Highlighter{config: config}
 	addDefaultCSS(config.HighlightClass)
-	highlighter.searchAndHighlight(js.Global.Get("document").Get("body"))
+	highlighter.parseAndHighlight(js.Global.Get("document").Get("body"))
 	highlighter.observeDOMChanges()
 }
 
@@ -71,7 +137,7 @@ func (h *Highlighter) debounceHighlight() {
 		js.Global.Get("clearTimeout").Invoke(h.debounceID)
 	}
 	h.debounceID = js.Global.Get("setTimeout").Invoke(func() {
-		h.searchAndHighlight(js.Global.Get("document").Get("body"))
+		h.parseAndHighlight(js.Global.Get("document").Get("body"))
 	}, h.config.DebounceTime)
 }
 
@@ -99,7 +165,7 @@ func (h *Highlighter) collectTextNodes(node *js.Object, result *[]*js.Object) {
 	}
 }
 
-func (h *Highlighter) searchAndHighlight(root *js.Object) {
+func (h *Highlighter) parseAndHighlight(root *js.Object) {
 	var textNodes []*js.Object
 	h.collectTextNodes(root, &textNodes)
 
@@ -118,26 +184,30 @@ func (h *Highlighter) highlightTextNode(textNode *js.Object) {
 		Start int
 		End   int
 		Word  string
+
+		WordSet WordSet
 	}
 	var matches []Match
 	lowerText := strings.ToLower(text)
 
-	for _, word := range h.config.Words {
-		word = strings.TrimSpace(word)
-		if word == "" {
-			continue
-		}
-		wordLower := strings.ToLower(word)
-		idx := 0
-		for {
-			pos := strings.Index(lowerText[idx:], wordLower)
-			if pos == -1 {
-				break
+	for _, ws := range h.config.WordSets {
+		for _, word := range ws.Words {
+			word = strings.TrimSpace(word)
+			if word == "" {
+				continue
 			}
-			start := idx + pos
-			end := start + len(word)
-			matches = append(matches, Match{Start: start, End: end, Word: text[start:end]})
-			idx = end
+			wordLower := strings.ToLower(word)
+			idx := 0
+			for {
+				pos := strings.Index(lowerText[idx:], wordLower)
+				if pos == -1 {
+					break
+				}
+				start := idx + pos
+				end := start + len(word)
+				matches = append(matches, Match{Start: start, End: end, Word: text[start:end], WordSet: ws})
+				idx = end
+			}
 		}
 	}
 
@@ -149,7 +219,6 @@ func (h *Highlighter) highlightTextNode(textNode *js.Object) {
 		return matches[i].Start < matches[j].Start
 	})
 
-	// Объединение перекрывающихся подсветок
 	var merged []Match
 	for _, m := range matches {
 		if len(merged) == 0 || m.Start >= merged[len(merged)-1].End {
@@ -171,6 +240,8 @@ func (h *Highlighter) highlightTextNode(textNode *js.Object) {
 		}
 		span := doc.Call("createElement", "span")
 		span.Get("classList").Call("add", h.config.HighlightClass)
+		span.Get("style").Set("background-color", m.WordSet.BackgroundColor)
+		span.Get("style").Set("color", m.WordSet.TextColor)
 		span.Set("textContent", text[m.Start:m.End])
 		fragment.Call("appendChild", span)
 		prev = m.End
@@ -192,7 +263,7 @@ func addDefaultCSS(className string) {
 	}
 	style := js.Global.Get("document").Call("createElement", "style")
 	style.Set("id", styleID)
-	style.Set("textContent", `.`+className+` { background-color: yellow; color: black; }`)
+	style.Set("textContent", `.`+className+` { }`)
 	js.Global.Get("document").Get("head").Call("appendChild", style)
 }
 

@@ -1,13 +1,31 @@
 // ==UserScript==
-// @name         New Userscript
+// @name         Overword
 // @namespace    http://tampermonkey.net/
 // @version      2025-05-07
 // @description  try to take over the world!
 // @author       You
 // @match        http://*/*
 // @icon         data:image/gif;base64,R0lGODlhAQABAAAAACH5BAEKAAEALAAAAAABAAEAAAICTAEAOw==
-// @grant        none
+// @grant        GM_setValue
+// @grant        GM_getValue
+// @grant        GM_deleteValue
+// @grant        GM_registerMenuCommand
+// @grant        GM_unregisterMenuCommand
+// @grant        GM_addValueChangeListener
+// @grant        unsafeWindow
+// @require      https://github.com/PRO-2684/GM_config/releases/download/v1.2.1/config.min.js#md5=525526b8f0b6b8606cedf08c651163c2
 // ==/UserScript==
+
+
+(function() {
+    'use strict';
+    if (typeof GM_config !== 'undefined') {
+        unsafeWindow.GM_config = GM_config;
+    }
+})();
+
+// gopher.js
+
 
 "use strict";
 (function() {
@@ -5638,6 +5656,295 @@ $packages["errors"] = (function() {
 	$pkg.$init = $init;
 	return $pkg;
 })();
+$packages["internal/cpu"] = (function() {
+	var $pkg = {}, $init;
+	$init = function() {
+		$pkg.$init = function() {};
+		/* */ var $f, $c = false, $s = 0, $r; if (this !== undefined && this.$blk !== undefined) { $f = this; $c = true; $s = $f.$s; $r = $f.$r; } s: while (true) { switch ($s) { case 0:
+		/* */ } return; } if ($f === undefined) { $f = { $blk: $init }; } $f.$s = $s; $f.$r = $r; return $f;
+	};
+	$pkg.$init = $init;
+	return $pkg;
+})();
+$packages["internal/bytealg"] = (function() {
+	var $pkg = {}, $init, cpu;
+	cpu = $packages["internal/cpu"];
+	$init = function() {
+		$pkg.$init = function() {};
+		/* */ var $f, $c = false, $s = 0, $r; if (this !== undefined && this.$blk !== undefined) { $f = this; $c = true; $s = $f.$s; $r = $f.$r; } s: while (true) { switch ($s) { case 0:
+		$r = cpu.$init(); /* */ $s = 1; case 1: if($c) { $c = false; $r = $r.$blk(); } if ($r && $r.$blk !== undefined) { break s; }
+		/* */ } return; } if ($f === undefined) { $f = { $blk: $init }; } $f.$s = $s; $f.$r = $r; return $f;
+	};
+	$pkg.$init = $init;
+	return $pkg;
+})();
+$packages["math"] = (function() {
+	var $pkg = {}, $init, js, bits, arrayType, arrayType$1, arrayType$2, structType, math, nan, buf, init;
+	js = $packages["github.com/gopherjs/gopherjs/js"];
+	bits = $packages["math/bits"];
+	arrayType = $arrayType($Uint32, 2);
+	arrayType$1 = $arrayType($Float32, 2);
+	arrayType$2 = $arrayType($Float64, 1);
+	structType = $structType("math", [{prop: "uint32array", name: "uint32array", embedded: false, exported: false, typ: arrayType, tag: ""}, {prop: "float32array", name: "float32array", embedded: false, exported: false, typ: arrayType$1, tag: ""}, {prop: "float64array", name: "float64array", embedded: false, exported: false, typ: arrayType$2, tag: ""}]);
+	init = function() {
+		var ab;
+		ab = new ($global.ArrayBuffer)(8);
+		buf.uint32array = new ($global.Uint32Array)(ab);
+		buf.float32array = new ($global.Float32Array)(ab);
+		buf.float64array = new ($global.Float64Array)(ab);
+	};
+	$init = function() {
+		$pkg.$init = function() {};
+		/* */ var $f, $c = false, $s = 0, $r; if (this !== undefined && this.$blk !== undefined) { $f = this; $c = true; $s = $f.$s; $r = $f.$r; } s: while (true) { switch ($s) { case 0:
+		$r = js.$init(); /* */ $s = 1; case 1: if($c) { $c = false; $r = $r.$blk(); } if ($r && $r.$blk !== undefined) { break s; }
+		$r = bits.$init(); /* */ $s = 2; case 2: if($c) { $c = false; $r = $r.$blk(); } if ($r && $r.$blk !== undefined) { break s; }
+		buf = new structType.ptr(arrayType.zero(), arrayType$1.zero(), arrayType$2.zero());
+		math = $global.Math;
+		nan = $parseFloat($NaN);
+		init();
+		/* */ } return; } if ($f === undefined) { $f = { $blk: $init }; } $f.$s = $s; $f.$r = $r; return $f;
+	};
+	$pkg.$init = $init;
+	return $pkg;
+})();
+$packages["unicode/utf8"] = (function() {
+	var $pkg = {}, $init, acceptRange, first, acceptRanges, DecodeRuneInString, DecodeLastRuneInString, RuneLen, EncodeRune, RuneStart;
+	acceptRange = $pkg.acceptRange = $newType(0, $kindStruct, "utf8.acceptRange", true, "unicode/utf8", false, function(lo_, hi_) {
+		this.$val = this;
+		if (arguments.length === 0) {
+			this.lo = 0;
+			this.hi = 0;
+			return;
+		}
+		this.lo = lo_;
+		this.hi = hi_;
+	});
+	DecodeRuneInString = function(s) {
+		var _tmp, _tmp$1, _tmp$10, _tmp$11, _tmp$12, _tmp$13, _tmp$14, _tmp$15, _tmp$16, _tmp$17, _tmp$2, _tmp$3, _tmp$4, _tmp$5, _tmp$6, _tmp$7, _tmp$8, _tmp$9, accept, mask, n, r, s, s0, s1, s2, s3, size, sz, x, x$1;
+		r = 0;
+		size = 0;
+		n = s.length;
+		if (n < 1) {
+			_tmp = 65533;
+			_tmp$1 = 0;
+			r = _tmp;
+			size = _tmp$1;
+			return [r, size];
+		}
+		s0 = s.charCodeAt(0);
+		x = ((s0 < 0 || s0 >= first.length) ? ($throwRuntimeError("index out of range"), undefined) : first[s0]);
+		if (x >= 240) {
+			mask = (((x >> 0)) << 31 >> 0) >> 31 >> 0;
+			_tmp$2 = ((((s.charCodeAt(0) >> 0)) & ~mask) >> 0) | (65533 & mask);
+			_tmp$3 = 1;
+			r = _tmp$2;
+			size = _tmp$3;
+			return [r, size];
+		}
+		sz = ((((x & 7) >>> 0) >> 0));
+		accept = $clone((x$1 = x >>> 4 << 24 >>> 24, ((x$1 < 0 || x$1 >= acceptRanges.length) ? ($throwRuntimeError("index out of range"), undefined) : acceptRanges[x$1])), acceptRange);
+		if (n < sz) {
+			_tmp$4 = 65533;
+			_tmp$5 = 1;
+			r = _tmp$4;
+			size = _tmp$5;
+			return [r, size];
+		}
+		s1 = s.charCodeAt(1);
+		if (s1 < accept.lo || accept.hi < s1) {
+			_tmp$6 = 65533;
+			_tmp$7 = 1;
+			r = _tmp$6;
+			size = _tmp$7;
+			return [r, size];
+		}
+		if (sz <= 2) {
+			_tmp$8 = (((((s0 & 31) >>> 0) >> 0)) << 6 >> 0) | ((((s1 & 63) >>> 0) >> 0));
+			_tmp$9 = 2;
+			r = _tmp$8;
+			size = _tmp$9;
+			return [r, size];
+		}
+		s2 = s.charCodeAt(2);
+		if (s2 < 128 || 191 < s2) {
+			_tmp$10 = 65533;
+			_tmp$11 = 1;
+			r = _tmp$10;
+			size = _tmp$11;
+			return [r, size];
+		}
+		if (sz <= 3) {
+			_tmp$12 = ((((((s0 & 15) >>> 0) >> 0)) << 12 >> 0) | (((((s1 & 63) >>> 0) >> 0)) << 6 >> 0)) | ((((s2 & 63) >>> 0) >> 0));
+			_tmp$13 = 3;
+			r = _tmp$12;
+			size = _tmp$13;
+			return [r, size];
+		}
+		s3 = s.charCodeAt(3);
+		if (s3 < 128 || 191 < s3) {
+			_tmp$14 = 65533;
+			_tmp$15 = 1;
+			r = _tmp$14;
+			size = _tmp$15;
+			return [r, size];
+		}
+		_tmp$16 = (((((((s0 & 7) >>> 0) >> 0)) << 18 >> 0) | (((((s1 & 63) >>> 0) >> 0)) << 12 >> 0)) | (((((s2 & 63) >>> 0) >> 0)) << 6 >> 0)) | ((((s3 & 63) >>> 0) >> 0));
+		_tmp$17 = 4;
+		r = _tmp$16;
+		size = _tmp$17;
+		return [r, size];
+	};
+	$pkg.DecodeRuneInString = DecodeRuneInString;
+	DecodeLastRuneInString = function(s) {
+		var _tmp, _tmp$1, _tmp$2, _tmp$3, _tmp$4, _tmp$5, _tmp$6, _tmp$7, _tuple, end, lim, r, s, size, start;
+		r = 0;
+		size = 0;
+		end = s.length;
+		if (end === 0) {
+			_tmp = 65533;
+			_tmp$1 = 0;
+			r = _tmp;
+			size = _tmp$1;
+			return [r, size];
+		}
+		start = end - 1 >> 0;
+		r = ((s.charCodeAt(start) >> 0));
+		if (r < 128) {
+			_tmp$2 = r;
+			_tmp$3 = 1;
+			r = _tmp$2;
+			size = _tmp$3;
+			return [r, size];
+		}
+		lim = end - 4 >> 0;
+		if (lim < 0) {
+			lim = 0;
+		}
+		start = start - (1) >> 0;
+		while (true) {
+			if (!(start >= lim)) { break; }
+			if (RuneStart(s.charCodeAt(start))) {
+				break;
+			}
+			start = start - (1) >> 0;
+		}
+		if (start < 0) {
+			start = 0;
+		}
+		_tuple = DecodeRuneInString($substring(s, start, end));
+		r = _tuple[0];
+		size = _tuple[1];
+		if (!(((start + size >> 0) === end))) {
+			_tmp$4 = 65533;
+			_tmp$5 = 1;
+			r = _tmp$4;
+			size = _tmp$5;
+			return [r, size];
+		}
+		_tmp$6 = r;
+		_tmp$7 = size;
+		r = _tmp$6;
+		size = _tmp$7;
+		return [r, size];
+	};
+	$pkg.DecodeLastRuneInString = DecodeLastRuneInString;
+	RuneLen = function(r) {
+		var r;
+		if (r < 0) {
+			return -1;
+		} else if (r <= 127) {
+			return 1;
+		} else if (r <= 2047) {
+			return 2;
+		} else if (55296 <= r && r <= 57343) {
+			return -1;
+		} else if (r <= 65535) {
+			return 3;
+		} else if (r <= 1114111) {
+			return 4;
+		}
+		return -1;
+	};
+	$pkg.RuneLen = RuneLen;
+	EncodeRune = function(p, r) {
+		var i, p, r;
+		i = ((r >>> 0));
+		if (i <= 127) {
+			(0 >= p.$length ? ($throwRuntimeError("index out of range"), undefined) : p.$array[p.$offset + 0] = ((r << 24 >>> 24)));
+			return 1;
+		} else if (i <= 2047) {
+			$unused((1 >= p.$length ? ($throwRuntimeError("index out of range"), undefined) : p.$array[p.$offset + 1]));
+			(0 >= p.$length ? ($throwRuntimeError("index out of range"), undefined) : p.$array[p.$offset + 0] = ((192 | (((r >> 6 >> 0) << 24 >>> 24))) >>> 0));
+			(1 >= p.$length ? ($throwRuntimeError("index out of range"), undefined) : p.$array[p.$offset + 1] = ((128 | ((((r << 24 >>> 24)) & 63) >>> 0)) >>> 0));
+			return 2;
+		} else if ((i > 1114111) || (55296 <= i && i <= 57343)) {
+			r = 65533;
+			$unused((2 >= p.$length ? ($throwRuntimeError("index out of range"), undefined) : p.$array[p.$offset + 2]));
+			(0 >= p.$length ? ($throwRuntimeError("index out of range"), undefined) : p.$array[p.$offset + 0] = ((224 | (((r >> 12 >> 0) << 24 >>> 24))) >>> 0));
+			(1 >= p.$length ? ($throwRuntimeError("index out of range"), undefined) : p.$array[p.$offset + 1] = ((128 | (((((r >> 6 >> 0) << 24 >>> 24)) & 63) >>> 0)) >>> 0));
+			(2 >= p.$length ? ($throwRuntimeError("index out of range"), undefined) : p.$array[p.$offset + 2] = ((128 | ((((r << 24 >>> 24)) & 63) >>> 0)) >>> 0));
+			return 3;
+		} else if (i <= 65535) {
+			$unused((2 >= p.$length ? ($throwRuntimeError("index out of range"), undefined) : p.$array[p.$offset + 2]));
+			(0 >= p.$length ? ($throwRuntimeError("index out of range"), undefined) : p.$array[p.$offset + 0] = ((224 | (((r >> 12 >> 0) << 24 >>> 24))) >>> 0));
+			(1 >= p.$length ? ($throwRuntimeError("index out of range"), undefined) : p.$array[p.$offset + 1] = ((128 | (((((r >> 6 >> 0) << 24 >>> 24)) & 63) >>> 0)) >>> 0));
+			(2 >= p.$length ? ($throwRuntimeError("index out of range"), undefined) : p.$array[p.$offset + 2] = ((128 | ((((r << 24 >>> 24)) & 63) >>> 0)) >>> 0));
+			return 3;
+		} else {
+			$unused((3 >= p.$length ? ($throwRuntimeError("index out of range"), undefined) : p.$array[p.$offset + 3]));
+			(0 >= p.$length ? ($throwRuntimeError("index out of range"), undefined) : p.$array[p.$offset + 0] = ((240 | (((r >> 18 >> 0) << 24 >>> 24))) >>> 0));
+			(1 >= p.$length ? ($throwRuntimeError("index out of range"), undefined) : p.$array[p.$offset + 1] = ((128 | (((((r >> 12 >> 0) << 24 >>> 24)) & 63) >>> 0)) >>> 0));
+			(2 >= p.$length ? ($throwRuntimeError("index out of range"), undefined) : p.$array[p.$offset + 2] = ((128 | (((((r >> 6 >> 0) << 24 >>> 24)) & 63) >>> 0)) >>> 0));
+			(3 >= p.$length ? ($throwRuntimeError("index out of range"), undefined) : p.$array[p.$offset + 3] = ((128 | ((((r << 24 >>> 24)) & 63) >>> 0)) >>> 0));
+			return 4;
+		}
+	};
+	$pkg.EncodeRune = EncodeRune;
+	RuneStart = function(b) {
+		var b;
+		return !((((b & 192) >>> 0) === 128));
+	};
+	$pkg.RuneStart = RuneStart;
+	acceptRange.init("unicode/utf8", [{prop: "lo", name: "lo", embedded: false, exported: false, typ: $Uint8, tag: ""}, {prop: "hi", name: "hi", embedded: false, exported: false, typ: $Uint8, tag: ""}]);
+	$init = function() {
+		$pkg.$init = function() {};
+		/* */ var $f, $c = false, $s = 0, $r; if (this !== undefined && this.$blk !== undefined) { $f = this; $c = true; $s = $f.$s; $r = $f.$r; } s: while (true) { switch ($s) { case 0:
+		first = $toNativeArray($kindUint8, [240, 240, 240, 240, 240, 240, 240, 240, 240, 240, 240, 240, 240, 240, 240, 240, 240, 240, 240, 240, 240, 240, 240, 240, 240, 240, 240, 240, 240, 240, 240, 240, 240, 240, 240, 240, 240, 240, 240, 240, 240, 240, 240, 240, 240, 240, 240, 240, 240, 240, 240, 240, 240, 240, 240, 240, 240, 240, 240, 240, 240, 240, 240, 240, 240, 240, 240, 240, 240, 240, 240, 240, 240, 240, 240, 240, 240, 240, 240, 240, 240, 240, 240, 240, 240, 240, 240, 240, 240, 240, 240, 240, 240, 240, 240, 240, 240, 240, 240, 240, 240, 240, 240, 240, 240, 240, 240, 240, 240, 240, 240, 240, 240, 240, 240, 240, 240, 240, 240, 240, 240, 240, 240, 240, 240, 240, 240, 240, 241, 241, 241, 241, 241, 241, 241, 241, 241, 241, 241, 241, 241, 241, 241, 241, 241, 241, 241, 241, 241, 241, 241, 241, 241, 241, 241, 241, 241, 241, 241, 241, 241, 241, 241, 241, 241, 241, 241, 241, 241, 241, 241, 241, 241, 241, 241, 241, 241, 241, 241, 241, 241, 241, 241, 241, 241, 241, 241, 241, 241, 241, 241, 241, 241, 241, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 19, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 35, 3, 3, 52, 4, 4, 4, 68, 241, 241, 241, 241, 241, 241, 241, 241, 241, 241, 241]);
+		acceptRanges = $toNativeArray($kindStruct, [$clone(new acceptRange.ptr(128, 191), acceptRange), $clone(new acceptRange.ptr(160, 191), acceptRange), $clone(new acceptRange.ptr(128, 159), acceptRange), $clone(new acceptRange.ptr(144, 191), acceptRange), $clone(new acceptRange.ptr(128, 143), acceptRange), new acceptRange.ptr(0, 0), new acceptRange.ptr(0, 0), new acceptRange.ptr(0, 0), new acceptRange.ptr(0, 0), new acceptRange.ptr(0, 0), new acceptRange.ptr(0, 0), new acceptRange.ptr(0, 0), new acceptRange.ptr(0, 0), new acceptRange.ptr(0, 0), new acceptRange.ptr(0, 0), new acceptRange.ptr(0, 0)]);
+		/* */ } return; } if ($f === undefined) { $f = { $blk: $init }; } $f.$s = $s; $f.$r = $r; return $f;
+	};
+	$pkg.$init = $init;
+	return $pkg;
+})();
+$packages["strconv"] = (function() {
+	var $pkg = {}, $init, errors, js, bytealg, math, bits, utf8, Itoa;
+	errors = $packages["errors"];
+	js = $packages["github.com/gopherjs/gopherjs/js"];
+	bytealg = $packages["internal/bytealg"];
+	math = $packages["math"];
+	bits = $packages["math/bits"];
+	utf8 = $packages["unicode/utf8"];
+	Itoa = function(i) {
+		var i;
+		return $internalize(i.toString(), $String);
+	};
+	$pkg.Itoa = Itoa;
+	$init = function() {
+		$pkg.$init = function() {};
+		/* */ var $f, $c = false, $s = 0, $r; if (this !== undefined && this.$blk !== undefined) { $f = this; $c = true; $s = $f.$s; $r = $f.$r; } s: while (true) { switch ($s) { case 0:
+		$r = errors.$init(); /* */ $s = 1; case 1: if($c) { $c = false; $r = $r.$blk(); } if ($r && $r.$blk !== undefined) { break s; }
+		$r = js.$init(); /* */ $s = 2; case 2: if($c) { $c = false; $r = $r.$blk(); } if ($r && $r.$blk !== undefined) { break s; }
+		$r = bytealg.$init(); /* */ $s = 3; case 3: if($c) { $c = false; $r = $r.$blk(); } if ($r && $r.$blk !== undefined) { break s; }
+		$r = math.$init(); /* */ $s = 4; case 4: if($c) { $c = false; $r = $r.$blk(); } if ($r && $r.$blk !== undefined) { break s; }
+		$r = bits.$init(); /* */ $s = 5; case 5: if($c) { $c = false; $r = $r.$blk(); } if ($r && $r.$blk !== undefined) { break s; }
+		$r = utf8.$init(); /* */ $s = 6; case 6: if($c) { $c = false; $r = $r.$blk(); } if ($r && $r.$blk !== undefined) { break s; }
+		$pkg.ErrRange = errors.New("value out of range");
+		$pkg.ErrSyntax = errors.New("invalid syntax");
+		/* */ } return; } if ($f === undefined) { $f = { $blk: $init }; } $f.$s = $s; $f.$r = $r; return $f;
+	};
+	$pkg.$init = $init;
+	return $pkg;
+})();
 $packages["internal/race"] = (function() {
 	var $pkg = {}, $init;
 	$init = function() {
@@ -6013,215 +6320,6 @@ $packages["unicode"] = (function() {
 	$pkg.$init = $init;
 	return $pkg;
 })();
-$packages["unicode/utf8"] = (function() {
-	var $pkg = {}, $init, acceptRange, first, acceptRanges, DecodeRuneInString, DecodeLastRuneInString, RuneLen, EncodeRune, RuneStart;
-	acceptRange = $pkg.acceptRange = $newType(0, $kindStruct, "utf8.acceptRange", true, "unicode/utf8", false, function(lo_, hi_) {
-		this.$val = this;
-		if (arguments.length === 0) {
-			this.lo = 0;
-			this.hi = 0;
-			return;
-		}
-		this.lo = lo_;
-		this.hi = hi_;
-	});
-	DecodeRuneInString = function(s) {
-		var _tmp, _tmp$1, _tmp$10, _tmp$11, _tmp$12, _tmp$13, _tmp$14, _tmp$15, _tmp$16, _tmp$17, _tmp$2, _tmp$3, _tmp$4, _tmp$5, _tmp$6, _tmp$7, _tmp$8, _tmp$9, accept, mask, n, r, s, s0, s1, s2, s3, size, sz, x, x$1;
-		r = 0;
-		size = 0;
-		n = s.length;
-		if (n < 1) {
-			_tmp = 65533;
-			_tmp$1 = 0;
-			r = _tmp;
-			size = _tmp$1;
-			return [r, size];
-		}
-		s0 = s.charCodeAt(0);
-		x = ((s0 < 0 || s0 >= first.length) ? ($throwRuntimeError("index out of range"), undefined) : first[s0]);
-		if (x >= 240) {
-			mask = (((x >> 0)) << 31 >> 0) >> 31 >> 0;
-			_tmp$2 = ((((s.charCodeAt(0) >> 0)) & ~mask) >> 0) | (65533 & mask);
-			_tmp$3 = 1;
-			r = _tmp$2;
-			size = _tmp$3;
-			return [r, size];
-		}
-		sz = ((((x & 7) >>> 0) >> 0));
-		accept = $clone((x$1 = x >>> 4 << 24 >>> 24, ((x$1 < 0 || x$1 >= acceptRanges.length) ? ($throwRuntimeError("index out of range"), undefined) : acceptRanges[x$1])), acceptRange);
-		if (n < sz) {
-			_tmp$4 = 65533;
-			_tmp$5 = 1;
-			r = _tmp$4;
-			size = _tmp$5;
-			return [r, size];
-		}
-		s1 = s.charCodeAt(1);
-		if (s1 < accept.lo || accept.hi < s1) {
-			_tmp$6 = 65533;
-			_tmp$7 = 1;
-			r = _tmp$6;
-			size = _tmp$7;
-			return [r, size];
-		}
-		if (sz <= 2) {
-			_tmp$8 = (((((s0 & 31) >>> 0) >> 0)) << 6 >> 0) | ((((s1 & 63) >>> 0) >> 0));
-			_tmp$9 = 2;
-			r = _tmp$8;
-			size = _tmp$9;
-			return [r, size];
-		}
-		s2 = s.charCodeAt(2);
-		if (s2 < 128 || 191 < s2) {
-			_tmp$10 = 65533;
-			_tmp$11 = 1;
-			r = _tmp$10;
-			size = _tmp$11;
-			return [r, size];
-		}
-		if (sz <= 3) {
-			_tmp$12 = ((((((s0 & 15) >>> 0) >> 0)) << 12 >> 0) | (((((s1 & 63) >>> 0) >> 0)) << 6 >> 0)) | ((((s2 & 63) >>> 0) >> 0));
-			_tmp$13 = 3;
-			r = _tmp$12;
-			size = _tmp$13;
-			return [r, size];
-		}
-		s3 = s.charCodeAt(3);
-		if (s3 < 128 || 191 < s3) {
-			_tmp$14 = 65533;
-			_tmp$15 = 1;
-			r = _tmp$14;
-			size = _tmp$15;
-			return [r, size];
-		}
-		_tmp$16 = (((((((s0 & 7) >>> 0) >> 0)) << 18 >> 0) | (((((s1 & 63) >>> 0) >> 0)) << 12 >> 0)) | (((((s2 & 63) >>> 0) >> 0)) << 6 >> 0)) | ((((s3 & 63) >>> 0) >> 0));
-		_tmp$17 = 4;
-		r = _tmp$16;
-		size = _tmp$17;
-		return [r, size];
-	};
-	$pkg.DecodeRuneInString = DecodeRuneInString;
-	DecodeLastRuneInString = function(s) {
-		var _tmp, _tmp$1, _tmp$2, _tmp$3, _tmp$4, _tmp$5, _tmp$6, _tmp$7, _tuple, end, lim, r, s, size, start;
-		r = 0;
-		size = 0;
-		end = s.length;
-		if (end === 0) {
-			_tmp = 65533;
-			_tmp$1 = 0;
-			r = _tmp;
-			size = _tmp$1;
-			return [r, size];
-		}
-		start = end - 1 >> 0;
-		r = ((s.charCodeAt(start) >> 0));
-		if (r < 128) {
-			_tmp$2 = r;
-			_tmp$3 = 1;
-			r = _tmp$2;
-			size = _tmp$3;
-			return [r, size];
-		}
-		lim = end - 4 >> 0;
-		if (lim < 0) {
-			lim = 0;
-		}
-		start = start - (1) >> 0;
-		while (true) {
-			if (!(start >= lim)) { break; }
-			if (RuneStart(s.charCodeAt(start))) {
-				break;
-			}
-			start = start - (1) >> 0;
-		}
-		if (start < 0) {
-			start = 0;
-		}
-		_tuple = DecodeRuneInString($substring(s, start, end));
-		r = _tuple[0];
-		size = _tuple[1];
-		if (!(((start + size >> 0) === end))) {
-			_tmp$4 = 65533;
-			_tmp$5 = 1;
-			r = _tmp$4;
-			size = _tmp$5;
-			return [r, size];
-		}
-		_tmp$6 = r;
-		_tmp$7 = size;
-		r = _tmp$6;
-		size = _tmp$7;
-		return [r, size];
-	};
-	$pkg.DecodeLastRuneInString = DecodeLastRuneInString;
-	RuneLen = function(r) {
-		var r;
-		if (r < 0) {
-			return -1;
-		} else if (r <= 127) {
-			return 1;
-		} else if (r <= 2047) {
-			return 2;
-		} else if (55296 <= r && r <= 57343) {
-			return -1;
-		} else if (r <= 65535) {
-			return 3;
-		} else if (r <= 1114111) {
-			return 4;
-		}
-		return -1;
-	};
-	$pkg.RuneLen = RuneLen;
-	EncodeRune = function(p, r) {
-		var i, p, r;
-		i = ((r >>> 0));
-		if (i <= 127) {
-			(0 >= p.$length ? ($throwRuntimeError("index out of range"), undefined) : p.$array[p.$offset + 0] = ((r << 24 >>> 24)));
-			return 1;
-		} else if (i <= 2047) {
-			$unused((1 >= p.$length ? ($throwRuntimeError("index out of range"), undefined) : p.$array[p.$offset + 1]));
-			(0 >= p.$length ? ($throwRuntimeError("index out of range"), undefined) : p.$array[p.$offset + 0] = ((192 | (((r >> 6 >> 0) << 24 >>> 24))) >>> 0));
-			(1 >= p.$length ? ($throwRuntimeError("index out of range"), undefined) : p.$array[p.$offset + 1] = ((128 | ((((r << 24 >>> 24)) & 63) >>> 0)) >>> 0));
-			return 2;
-		} else if ((i > 1114111) || (55296 <= i && i <= 57343)) {
-			r = 65533;
-			$unused((2 >= p.$length ? ($throwRuntimeError("index out of range"), undefined) : p.$array[p.$offset + 2]));
-			(0 >= p.$length ? ($throwRuntimeError("index out of range"), undefined) : p.$array[p.$offset + 0] = ((224 | (((r >> 12 >> 0) << 24 >>> 24))) >>> 0));
-			(1 >= p.$length ? ($throwRuntimeError("index out of range"), undefined) : p.$array[p.$offset + 1] = ((128 | (((((r >> 6 >> 0) << 24 >>> 24)) & 63) >>> 0)) >>> 0));
-			(2 >= p.$length ? ($throwRuntimeError("index out of range"), undefined) : p.$array[p.$offset + 2] = ((128 | ((((r << 24 >>> 24)) & 63) >>> 0)) >>> 0));
-			return 3;
-		} else if (i <= 65535) {
-			$unused((2 >= p.$length ? ($throwRuntimeError("index out of range"), undefined) : p.$array[p.$offset + 2]));
-			(0 >= p.$length ? ($throwRuntimeError("index out of range"), undefined) : p.$array[p.$offset + 0] = ((224 | (((r >> 12 >> 0) << 24 >>> 24))) >>> 0));
-			(1 >= p.$length ? ($throwRuntimeError("index out of range"), undefined) : p.$array[p.$offset + 1] = ((128 | (((((r >> 6 >> 0) << 24 >>> 24)) & 63) >>> 0)) >>> 0));
-			(2 >= p.$length ? ($throwRuntimeError("index out of range"), undefined) : p.$array[p.$offset + 2] = ((128 | ((((r << 24 >>> 24)) & 63) >>> 0)) >>> 0));
-			return 3;
-		} else {
-			$unused((3 >= p.$length ? ($throwRuntimeError("index out of range"), undefined) : p.$array[p.$offset + 3]));
-			(0 >= p.$length ? ($throwRuntimeError("index out of range"), undefined) : p.$array[p.$offset + 0] = ((240 | (((r >> 18 >> 0) << 24 >>> 24))) >>> 0));
-			(1 >= p.$length ? ($throwRuntimeError("index out of range"), undefined) : p.$array[p.$offset + 1] = ((128 | (((((r >> 12 >> 0) << 24 >>> 24)) & 63) >>> 0)) >>> 0));
-			(2 >= p.$length ? ($throwRuntimeError("index out of range"), undefined) : p.$array[p.$offset + 2] = ((128 | (((((r >> 6 >> 0) << 24 >>> 24)) & 63) >>> 0)) >>> 0));
-			(3 >= p.$length ? ($throwRuntimeError("index out of range"), undefined) : p.$array[p.$offset + 3] = ((128 | ((((r << 24 >>> 24)) & 63) >>> 0)) >>> 0));
-			return 4;
-		}
-	};
-	$pkg.EncodeRune = EncodeRune;
-	RuneStart = function(b) {
-		var b;
-		return !((((b & 192) >>> 0) === 128));
-	};
-	$pkg.RuneStart = RuneStart;
-	acceptRange.init("unicode/utf8", [{prop: "lo", name: "lo", embedded: false, exported: false, typ: $Uint8, tag: ""}, {prop: "hi", name: "hi", embedded: false, exported: false, typ: $Uint8, tag: ""}]);
-	$init = function() {
-		$pkg.$init = function() {};
-		/* */ var $f, $c = false, $s = 0, $r; if (this !== undefined && this.$blk !== undefined) { $f = this; $c = true; $s = $f.$s; $r = $f.$r; } s: while (true) { switch ($s) { case 0:
-		first = $toNativeArray($kindUint8, [240, 240, 240, 240, 240, 240, 240, 240, 240, 240, 240, 240, 240, 240, 240, 240, 240, 240, 240, 240, 240, 240, 240, 240, 240, 240, 240, 240, 240, 240, 240, 240, 240, 240, 240, 240, 240, 240, 240, 240, 240, 240, 240, 240, 240, 240, 240, 240, 240, 240, 240, 240, 240, 240, 240, 240, 240, 240, 240, 240, 240, 240, 240, 240, 240, 240, 240, 240, 240, 240, 240, 240, 240, 240, 240, 240, 240, 240, 240, 240, 240, 240, 240, 240, 240, 240, 240, 240, 240, 240, 240, 240, 240, 240, 240, 240, 240, 240, 240, 240, 240, 240, 240, 240, 240, 240, 240, 240, 240, 240, 240, 240, 240, 240, 240, 240, 240, 240, 240, 240, 240, 240, 240, 240, 240, 240, 240, 240, 241, 241, 241, 241, 241, 241, 241, 241, 241, 241, 241, 241, 241, 241, 241, 241, 241, 241, 241, 241, 241, 241, 241, 241, 241, 241, 241, 241, 241, 241, 241, 241, 241, 241, 241, 241, 241, 241, 241, 241, 241, 241, 241, 241, 241, 241, 241, 241, 241, 241, 241, 241, 241, 241, 241, 241, 241, 241, 241, 241, 241, 241, 241, 241, 241, 241, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 19, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 35, 3, 3, 52, 4, 4, 4, 68, 241, 241, 241, 241, 241, 241, 241, 241, 241, 241, 241]);
-		acceptRanges = $toNativeArray($kindStruct, [$clone(new acceptRange.ptr(128, 191), acceptRange), $clone(new acceptRange.ptr(160, 191), acceptRange), $clone(new acceptRange.ptr(128, 159), acceptRange), $clone(new acceptRange.ptr(144, 191), acceptRange), $clone(new acceptRange.ptr(128, 143), acceptRange), new acceptRange.ptr(0, 0), new acceptRange.ptr(0, 0), new acceptRange.ptr(0, 0), new acceptRange.ptr(0, 0), new acceptRange.ptr(0, 0), new acceptRange.ptr(0, 0), new acceptRange.ptr(0, 0), new acceptRange.ptr(0, 0), new acceptRange.ptr(0, 0), new acceptRange.ptr(0, 0), new acceptRange.ptr(0, 0)]);
-		/* */ } return; } if ($f === undefined) { $f = { $blk: $init }; } $f.$s = $s; $f.$r = $r; return $f;
-	};
-	$pkg.$init = $init;
-	return $pkg;
-})();
 $packages["strings"] = (function() {
 	var $pkg = {}, $init, errors, js, io, sync, unicode, utf8, Builder, ptrType$1, sliceType$2, asciiSpace, Map, ToLower, TrimLeftFunc, TrimRightFunc, TrimFunc, indexFunc, lastIndexFunc, TrimSpace, Index;
 	errors = $packages["errors"];
@@ -6587,26 +6685,41 @@ $packages["strings"] = (function() {
 	return $pkg;
 })();
 $packages["overword"] = (function() {
-	var $pkg = {}, $init, js, sort, strings, Config, Highlighter, Match, ptrType, ptrType$1, funcType, funcType$1, sliceType, mapType, sliceType$1, ptrType$2, sliceType$2, highlighter, main, initHighlighter, addDefaultCSS, stopHighlighter, removeHighlights;
+	var $pkg = {}, $init, js, sort, strconv, strings, WordSet, Config, Highlighter, Match, ptrType, funcType, mapType, sliceType$1, sliceType$2, ptrType$1, sliceType$3, ptrType$2, sliceType$4, highlighter, unsafeWindow, console, gmConfig, main, initHighlighter, addDefaultCSS, stopHighlighter, removeHighlights;
 	js = $packages["github.com/gopherjs/gopherjs/js"];
 	sort = $packages["sort"];
+	strconv = $packages["strconv"];
 	strings = $packages["strings"];
-	Config = $pkg.Config = $newType(0, $kindStruct, "main.Config", true, "overword", true, function(Words_, HighlightClass_, DebounceTime_) {
+	WordSet = $pkg.WordSet = $newType(0, $kindStruct, "main.WordSet", true, "overword", true, function(Name_, Words_, BackgroundColor_, TextColor_) {
 		this.$val = this;
 		if (arguments.length === 0) {
-			this.Words = sliceType.nil;
+			this.Name = "";
+			this.Words = sliceType$1.nil;
+			this.BackgroundColor = "";
+			this.TextColor = "";
+			return;
+		}
+		this.Name = Name_;
+		this.Words = Words_;
+		this.BackgroundColor = BackgroundColor_;
+		this.TextColor = TextColor_;
+	});
+	Config = $pkg.Config = $newType(0, $kindStruct, "main.Config", true, "overword", true, function(WordSets_, HighlightClass_, DebounceTime_) {
+		this.$val = this;
+		if (arguments.length === 0) {
+			this.WordSets = sliceType$2.nil;
 			this.HighlightClass = "";
 			this.DebounceTime = 0;
 			return;
 		}
-		this.Words = Words_;
+		this.WordSets = WordSets_;
 		this.HighlightClass = HighlightClass_;
 		this.DebounceTime = DebounceTime_;
 	});
 	Highlighter = $pkg.Highlighter = $newType(0, $kindStruct, "main.Highlighter", true, "overword", true, function(config_, observer_, debounceID_) {
 		this.$val = this;
 		if (arguments.length === 0) {
-			this.config = new Config.ptr(sliceType.nil, "", 0);
+			this.config = new Config.ptr(sliceType$2.nil, "", 0);
 			this.observer = null;
 			this.debounceID = null;
 			return;
@@ -6615,57 +6728,57 @@ $packages["overword"] = (function() {
 		this.observer = observer_;
 		this.debounceID = debounceID_;
 	});
-	Match = $newType(0, $kindStruct, "main.Match", true, "overword", true, function(Start_, End_, Word_) {
+	Match = $newType(0, $kindStruct, "main.Match", true, "overword", true, function(Start_, End_, Word_, WordSet_) {
 		this.$val = this;
 		if (arguments.length === 0) {
 			this.Start = 0;
 			this.End = 0;
 			this.Word = "";
+			this.WordSet = new WordSet.ptr("", sliceType$1.nil, "", "");
 			return;
 		}
 		this.Start = Start_;
 		this.End = End_;
 		this.Word = Word_;
+		this.WordSet = WordSet_;
 	});
 	ptrType = $ptrType(Highlighter);
-	ptrType$1 = $ptrType(js.Object);
-	funcType = $funcType([ptrType$1], [], false);
-	funcType$1 = $funcType([], [], false);
-	sliceType = $sliceType($String);
+	funcType = $funcType([], [], false);
 	mapType = $mapType($String, $emptyInterface);
-	sliceType$1 = $sliceType(ptrType$1);
-	ptrType$2 = $ptrType(sliceType$1);
-	sliceType$2 = $sliceType(Match);
+	sliceType$1 = $sliceType($String);
+	sliceType$2 = $sliceType(WordSet);
+	ptrType$1 = $ptrType(js.Object);
+	sliceType$3 = $sliceType(ptrType$1);
+	ptrType$2 = $ptrType(sliceType$3);
+	sliceType$4 = $sliceType(Match);
 	main = function() {
+		console = $global.console;
+		unsafeWindow = $global.unsafeWindow;
+		gmConfig = unsafeWindow.GM_config;
 		$global.initHighlighter = $externalize(initHighlighter, funcType);
-		$global.stopHighlighter = $externalize(stopHighlighter, funcType$1);
+		$global.stopHighlighter = $externalize(stopHighlighter, funcType);
 		$global.initHighlighter();
 	};
-	initHighlighter = function(wordsObj) {
-		var {config, i, word, words, wordsObj, $s, $r, $c} = $restore(this, {wordsObj});
+	initHighlighter = function() {
+		var {_r, _r$1, _r$2, _r$3, _r$4, config, slotFactory, $s, $r, $c} = $restore(this, {});
 		/* */ $s = $s || 0; s: while (true) { switch ($s) { case 0:
-		words = sliceType.nil;
-		if (!(wordsObj === null) && !(wordsObj === undefined)) {
-			i = 0;
-			while (true) {
-				if (!(i < $parseInt(wordsObj.length))) { break; }
-				word = $internalize(wordsObj[i], $String);
-				if (!(word === "")) {
-					words = $append(words, word);
-				}
-				i = i + (1) >> 0;
-			}
-		}
-		if (words.$length === 0) {
-			words = new sliceType(["\xD0\xB2\xD0\xB0\xD0\xB6\xD0\xBD\xD0\xBE", "\xD1\x81\xD1\x80\xD0\xBE\xD1\x87\xD0\xBD\xD0\xBE", "\xD0\xB2\xD0\xBD\xD0\xB8\xD0\xBC\xD0\xB0\xD0\xBD\xD0\xB8\xD0\xB5"]);
-		}
-		config = new Config.ptr(words, "highlightClass", 200);
+		slotFactory = (function(i) {
+			var i;
+			return $makeMap($String.keyFor, [{ k: "name", v: new $String("\xD0\xA1\xD0\xBF\xD0\xB8\xD1\x81\xD0\xBE\xD0\xBA \xD1\x81\xD0\xBB\xD0\xBE\xD0\xB2 " + strconv.Itoa(i)) }, { k: "type", v: new $String("folder") }, { k: "items", v: new mapType($makeMap($String.keyFor, [{ k: "name", v: new mapType($makeMap($String.keyFor, [{ k: "name", v: new $String("\xD0\x9D\xD0\xB0\xD0\xB7\xD0\xB2\xD0\xB0\xD0\xBD\xD0\xB8\xD0\xB5") }, { k: "type", v: new $String("str") }])) }, { k: "words", v: new mapType($makeMap($String.keyFor, [{ k: "name", v: new $String("\xD0\xA1\xD0\xBB\xD0\xBE\xD0\xB2\xD0\xB0") }, { k: "type", v: new $String("str") }])) }, { k: "backgroundColor", v: new mapType($makeMap($String.keyFor, [{ k: "name", v: new $String("\xD0\xA6\xD0\xB2\xD0\xB5\xD1\x82 \xD1\x84\xD0\xBE\xD0\xBD\xD0\xB0") }, { k: "type", v: new $String("folder") }, { k: "items", v: new mapType($makeMap($String.keyFor, [{ k: "green", v: new mapType($makeMap($String.keyFor, [{ k: "name", v: new $String("\xD0\x97\xD0\xB5\xD0\xBB\xD0\xB5\xD0\xBD\xD1\x8B\xD0\xB9") }, { k: "type", v: new $String("action") }])) }, { k: "red", v: new mapType($makeMap($String.keyFor, [{ k: "name", v: new $String("\xD0\x9A\xD1\x80\xD0\xB0\xD1\x81\xD0\xBD\xD1\x8B\xD0\xB9") }, { k: "type", v: new $String("action") }])) }])) }])) }, { k: "textColor", v: new mapType($makeMap($String.keyFor, [{ k: "name", v: new $String("\xD0\xA6\xD0\xB2\xD0\xB5\xD1\x82 \xD1\x82\xD0\xB5\xD0\xBA\xD1\x81\xD1\x82\xD0\xB0") }, { k: "type", v: new $String("enum") }, { k: "options", v: new sliceType$1(["black", "white"]) }])) }])) }]);
+		});
+		_r = slotFactory(1); /* */ $s = 1; case 1: if($c) { $c = false; _r = _r.$blk(); } if (_r && _r.$blk !== undefined) { break s; }
+		_r$1 = slotFactory(2); /* */ $s = 2; case 2: if($c) { $c = false; _r$1 = _r$1.$blk(); } if (_r$1 && _r$1.$blk !== undefined) { break s; }
+		_r$2 = slotFactory(3); /* */ $s = 3; case 3: if($c) { $c = false; _r$2 = _r$2.$blk(); } if (_r$2 && _r$2.$blk !== undefined) { break s; }
+		_r$3 = slotFactory(4); /* */ $s = 4; case 4: if($c) { $c = false; _r$3 = _r$3.$blk(); } if (_r$3 && _r$3.$blk !== undefined) { break s; }
+		_r$4 = slotFactory(5); /* */ $s = 5; case 5: if($c) { $c = false; _r$4 = _r$4.$blk(); } if (_r$4 && _r$4.$blk !== undefined) { break s; }
+		new (gmConfig)($externalize($makeMap($String.keyFor, [{ k: "slot_1", v: new mapType(_r) }, { k: "slot_2", v: new mapType(_r$1) }, { k: "slot_3", v: new mapType(_r$2) }, { k: "slot_4", v: new mapType(_r$3) }, { k: "slot_5", v: new mapType(_r$4) }]), mapType));
+		config = new Config.ptr(new sliceType$2([$clone(new WordSet.ptr("urgent", new sliceType$1(["\xD0\xB2\xD0\xB0\xD0\xB6\xD0\xBD\xD0\xBE", "\xD1\x81\xD1\x80\xD0\xBE\xD1\x87\xD0\xBD\xD0\xBE", "\xD0\xB2\xD0\xBD\xD0\xB8\xD0\xBC\xD0\xB0\xD0\xBD\xD0\xB8\xD0\xB5"]), "yellow", "black"), WordSet), $clone(new WordSet.ptr("adult", new sliceType$1(["\xD1\x85\xD1\x83\xD0\xB9", "\xD1\x85\xD1\x83\xD1\x91", "\xD0\xBF\xD0\xB8\xD0\xB7\xD0\xB4", "\xD0\xB1\xD0\xBB\xD1\x8F"]), "red", "white"), WordSet)]), "highlightClass", 1000);
 		highlighter = new Highlighter.ptr($clone(config, Config), null, null);
 		addDefaultCSS(config.HighlightClass);
-		$r = highlighter.searchAndHighlight($global.document.body); /* */ $s = 1; case 1: if($c) { $c = false; $r = $r.$blk(); } if ($r && $r.$blk !== undefined) { break s; }
+		$r = highlighter.parseAndHighlight($global.document.body); /* */ $s = 6; case 6: if($c) { $c = false; $r = $r.$blk(); } if ($r && $r.$blk !== undefined) { break s; }
 		highlighter.observeDOMChanges();
 		$s = -1; return;
-		/* */ } return; } var $f = {$blk: initHighlighter, $c: true, $r, config, i, word, words, wordsObj, $s};return $f;
+		/* */ } return; } var $f = {$blk: initHighlighter, $c: true, $r, _r, _r$1, _r$2, _r$3, _r$4, config, slotFactory, $s};return $f;
 	};
 	Highlighter.ptr.prototype.observeDOMChanges = function() {
 		var cb, h;
@@ -6688,10 +6801,10 @@ $packages["overword"] = (function() {
 		h.debounceID = $global.setTimeout($externalize((function $b() {
 			var {$s, $r, $c} = $restore(this, {});
 			/* */ $s = $s || 0; s: while (true) { switch ($s) { case 0:
-			$r = h.searchAndHighlight($global.document.body); /* */ $s = 1; case 1: if($c) { $c = false; $r = $r.$blk(); } if ($r && $r.$blk !== undefined) { break s; }
+			$r = h.parseAndHighlight($global.document.body); /* */ $s = 1; case 1: if($c) { $c = false; $r = $r.$blk(); } if ($r && $r.$blk !== undefined) { break s; }
 			$s = -1; return;
 			/* */ } return; } var $f = {$blk: $b, $c: true, $r, $s};return $f;
-		}), funcType$1), h.config.DebounceTime);
+		}), funcType), h.config.DebounceTime);
 	};
 	Highlighter.prototype.debounceHighlight = function() { return this.$val.debounceHighlight(); };
 	Highlighter.ptr.prototype.collectTextNodes = function(node, result) {
@@ -6724,12 +6837,12 @@ $packages["overword"] = (function() {
 		/* */ } return; } var $f = {$blk: Highlighter.ptr.prototype.collectTextNodes, $c: true, $r, _r, child, children, h, i, node, nodeType, result, tag, $s};return $f;
 	};
 	Highlighter.prototype.collectTextNodes = function(node, result) { return this.$val.collectTextNodes(node, result); };
-	Highlighter.ptr.prototype.searchAndHighlight = function(root) {
+	Highlighter.ptr.prototype.parseAndHighlight = function(root) {
 		var {_i, _ref, h, node, root, textNodes, $s, $r, $c} = $restore(this, {root});
 		/* */ $s = $s || 0; s: while (true) { switch ($s) { case 0:
 		textNodes = [textNodes];
 		h = this;
-		textNodes[0] = sliceType$1.nil;
+		textNodes[0] = sliceType$3.nil;
 		$r = h.collectTextNodes(root, (textNodes.$ptr || (textNodes.$ptr = new ptrType$2(function() { return this.$target[0]; }, function($v) { this.$target[0] = $v; }, textNodes)))); /* */ $s = 1; case 1: if($c) { $c = false; $r = $r.$blk(); } if ($r && $r.$blk !== undefined) { break s; }
 		_ref = textNodes[0];
 		_i = 0;
@@ -6741,11 +6854,11 @@ $packages["overword"] = (function() {
 		$s = 2; continue;
 		case 3:
 		$s = -1; return;
-		/* */ } return; } var $f = {$blk: Highlighter.ptr.prototype.searchAndHighlight, $c: true, $r, _i, _ref, h, node, root, textNodes, $s};return $f;
+		/* */ } return; } var $f = {$blk: Highlighter.ptr.prototype.parseAndHighlight, $c: true, $r, _i, _ref, h, node, root, textNodes, $s};return $f;
 	};
-	Highlighter.prototype.searchAndHighlight = function(root) { return this.$val.searchAndHighlight(root); };
+	Highlighter.prototype.parseAndHighlight = function(root) { return this.$val.parseAndHighlight(root); };
 	Highlighter.ptr.prototype.highlightTextNode = function(textNode) {
-		var {_i, _i$1, _i$2, _r, _r$1, _r$2, _ref, _ref$1, _ref$2, doc, end, fragment, h, idx, last, lowerText, m, m$1, matches, merged, parent, pos, prev, span, start, text, textNode, word, wordLower, x, x$1, $s, $r, $c} = $restore(this, {textNode});
+		var {_i, _i$1, _i$2, _i$3, _r, _r$1, _r$2, _ref, _ref$1, _ref$2, _ref$3, doc, end, fragment, h, idx, last, lowerText, m, m$1, matches, merged, parent, pos, prev, span, start, text, textNode, word, wordLower, ws, x, x$1, $s, $r, $c} = $restore(this, {textNode});
 		/* */ $s = $s || 0; s: while (true) { switch ($s) { case 0:
 		matches = [matches];
 		h = this;
@@ -6753,34 +6866,41 @@ $packages["overword"] = (function() {
 		if (text === "") {
 			$s = -1; return;
 		}
-		$global.console.log(textNode);
-		matches[0] = sliceType$2.nil;
+		matches[0] = sliceType$4.nil;
 		_r = strings.ToLower(text); /* */ $s = 1; case 1: if($c) { $c = false; _r = _r.$blk(); } if (_r && _r.$blk !== undefined) { break s; }
 		lowerText = _r;
-		_ref = h.config.Words;
+		_ref = h.config.WordSets;
 		_i = 0;
 		/* while (true) { */ case 2:
 			/* if (!(_i < _ref.$length)) { break; } */ if(!(_i < _ref.$length)) { $s = 3; continue; }
-			word = ((_i < 0 || _i >= _ref.$length) ? ($throwRuntimeError("index out of range"), undefined) : _ref.$array[_ref.$offset + _i]);
-			_r$1 = strings.TrimSpace(word); /* */ $s = 4; case 4: if($c) { $c = false; _r$1 = _r$1.$blk(); } if (_r$1 && _r$1.$blk !== undefined) { break s; }
-			word = _r$1;
-			if (word === "") {
-				_i++;
-				/* continue; */ $s = 2; continue;
-			}
-			_r$2 = strings.ToLower(word); /* */ $s = 5; case 5: if($c) { $c = false; _r$2 = _r$2.$blk(); } if (_r$2 && _r$2.$blk !== undefined) { break s; }
-			wordLower = _r$2;
-			idx = 0;
-			while (true) {
-				pos = strings.Index($substring(lowerText, idx), wordLower);
-				if (pos === -1) {
-					break;
+			ws = $clone(((_i < 0 || _i >= _ref.$length) ? ($throwRuntimeError("index out of range"), undefined) : _ref.$array[_ref.$offset + _i]), WordSet);
+			_ref$1 = ws.Words;
+			_i$1 = 0;
+			/* while (true) { */ case 4:
+				/* if (!(_i$1 < _ref$1.$length)) { break; } */ if(!(_i$1 < _ref$1.$length)) { $s = 5; continue; }
+				word = ((_i$1 < 0 || _i$1 >= _ref$1.$length) ? ($throwRuntimeError("index out of range"), undefined) : _ref$1.$array[_ref$1.$offset + _i$1]);
+				_r$1 = strings.TrimSpace(word); /* */ $s = 6; case 6: if($c) { $c = false; _r$1 = _r$1.$blk(); } if (_r$1 && _r$1.$blk !== undefined) { break s; }
+				word = _r$1;
+				if (word === "") {
+					_i$1++;
+					/* continue; */ $s = 4; continue;
 				}
-				start = idx + pos >> 0;
-				end = start + word.length >> 0;
-				matches[0] = $append(matches[0], new Match.ptr(start, end, $substring(text, start, end)));
-				idx = end;
-			}
+				_r$2 = strings.ToLower(word); /* */ $s = 7; case 7: if($c) { $c = false; _r$2 = _r$2.$blk(); } if (_r$2 && _r$2.$blk !== undefined) { break s; }
+				wordLower = _r$2;
+				idx = 0;
+				while (true) {
+					pos = strings.Index($substring(lowerText, idx), wordLower);
+					if (pos === -1) {
+						break;
+					}
+					start = idx + pos >> 0;
+					end = start + word.length >> 0;
+					matches[0] = $append(matches[0], new Match.ptr(start, end, $substring(text, start, end), $clone(ws, WordSet)));
+					idx = end;
+				}
+				_i$1++;
+			$s = 4; continue;
+			case 5:
 			_i++;
 		$s = 2; continue;
 		case 3:
@@ -6790,14 +6910,13 @@ $packages["overword"] = (function() {
 		$r = sort.Slice(matches[0], (function(matches) { return function(i, j) {
 			var i, j;
 			return ((i < 0 || i >= matches[0].$length) ? ($throwRuntimeError("index out of range"), undefined) : matches[0].$array[matches[0].$offset + i]).Start < ((j < 0 || j >= matches[0].$length) ? ($throwRuntimeError("index out of range"), undefined) : matches[0].$array[matches[0].$offset + j]).Start;
-		}; })(matches)); /* */ $s = 6; case 6: if($c) { $c = false; $r = $r.$blk(); } if ($r && $r.$blk !== undefined) { break s; }
-		$global.console.log($externalize(matches[0], sliceType$2));
-		merged = sliceType$2.nil;
-		_ref$1 = matches[0];
-		_i$1 = 0;
+		}; })(matches)); /* */ $s = 8; case 8: if($c) { $c = false; $r = $r.$blk(); } if ($r && $r.$blk !== undefined) { break s; }
+		merged = sliceType$4.nil;
+		_ref$2 = matches[0];
+		_i$2 = 0;
 		while (true) {
-			if (!(_i$1 < _ref$1.$length)) { break; }
-			m = $clone(((_i$1 < 0 || _i$1 >= _ref$1.$length) ? ($throwRuntimeError("index out of range"), undefined) : _ref$1.$array[_ref$1.$offset + _i$1]), Match);
+			if (!(_i$2 < _ref$2.$length)) { break; }
+			m = $clone(((_i$2 < 0 || _i$2 >= _ref$2.$length) ? ($throwRuntimeError("index out of range"), undefined) : _ref$2.$array[_ref$2.$offset + _i$2]), Match);
 			if ((merged.$length === 0) || m.Start >= (x = merged.$length - 1 >> 0, ((x < 0 || x >= merged.$length) ? ($throwRuntimeError("index out of range"), undefined) : merged.$array[merged.$offset + x])).End) {
 				merged = $append(merged, m);
 			} else {
@@ -6806,26 +6925,27 @@ $packages["overword"] = (function() {
 					last.End = m.End;
 				}
 			}
-			_i$1++;
+			_i$2++;
 		}
-		$global.console.log($externalize(merged, sliceType$2));
 		doc = $global.document;
 		fragment = doc.createDocumentFragment();
 		prev = 0;
-		_ref$2 = merged;
-		_i$2 = 0;
+		_ref$3 = merged;
+		_i$3 = 0;
 		while (true) {
-			if (!(_i$2 < _ref$2.$length)) { break; }
-			m$1 = $clone(((_i$2 < 0 || _i$2 >= _ref$2.$length) ? ($throwRuntimeError("index out of range"), undefined) : _ref$2.$array[_ref$2.$offset + _i$2]), Match);
+			if (!(_i$3 < _ref$3.$length)) { break; }
+			m$1 = $clone(((_i$3 < 0 || _i$3 >= _ref$3.$length) ? ($throwRuntimeError("index out of range"), undefined) : _ref$3.$array[_ref$3.$offset + _i$3]), Match);
 			if (m$1.Start > prev) {
 				fragment.appendChild(doc.createTextNode($externalize($substring(text, prev, m$1.Start), $String)));
 			}
 			span = doc.createElement($externalize("span", $String));
 			span.classList.add($externalize(h.config.HighlightClass, $String));
+			span.style[$externalize("background-color", $String)] = $externalize(m$1.WordSet.BackgroundColor, $String);
+			span.style.color = $externalize(m$1.WordSet.TextColor, $String);
 			span.textContent = $externalize($substring(text, m$1.Start, m$1.End), $String);
 			fragment.appendChild(span);
 			prev = m$1.End;
-			_i$2++;
+			_i$3++;
 		}
 		if (prev < text.length) {
 			fragment.appendChild(doc.createTextNode($externalize($substring(text, prev), $String)));
@@ -6835,7 +6955,7 @@ $packages["overword"] = (function() {
 			parent.replaceChild(fragment, textNode);
 		}
 		$s = -1; return;
-		/* */ } return; } var $f = {$blk: Highlighter.ptr.prototype.highlightTextNode, $c: true, $r, _i, _i$1, _i$2, _r, _r$1, _r$2, _ref, _ref$1, _ref$2, doc, end, fragment, h, idx, last, lowerText, m, m$1, matches, merged, parent, pos, prev, span, start, text, textNode, word, wordLower, x, x$1, $s};return $f;
+		/* */ } return; } var $f = {$blk: Highlighter.ptr.prototype.highlightTextNode, $c: true, $r, _i, _i$1, _i$2, _i$3, _r, _r$1, _r$2, _ref, _ref$1, _ref$2, _ref$3, doc, end, fragment, h, idx, last, lowerText, m, m$1, matches, merged, parent, pos, prev, span, start, text, textNode, word, wordLower, ws, x, x$1, $s};return $f;
 	};
 	Highlighter.prototype.highlightTextNode = function(textNode) { return this.$val.highlightTextNode(textNode); };
 	addDefaultCSS = function(className) {
@@ -6846,7 +6966,7 @@ $packages["overword"] = (function() {
 		}
 		style = $global.document.createElement($externalize("style", $String));
 		style.id = $externalize(styleID, $String);
-		style.textContent = $externalize("." + className + " { background-color: yellow; color: black; }", $String);
+		style.textContent = $externalize("." + className + " { }", $String);
 		$global.document.head.appendChild(style);
 	};
 	stopHighlighter = function() {
@@ -6872,17 +6992,22 @@ $packages["overword"] = (function() {
 			i = i + (1) >> 0;
 		}
 	};
-	ptrType.methods = [{prop: "observeDOMChanges", name: "observeDOMChanges", pkg: "overword", typ: $funcType([], [], false)}, {prop: "debounceHighlight", name: "debounceHighlight", pkg: "overword", typ: $funcType([], [], false)}, {prop: "collectTextNodes", name: "collectTextNodes", pkg: "overword", typ: $funcType([ptrType$1, ptrType$2], [], false)}, {prop: "searchAndHighlight", name: "searchAndHighlight", pkg: "overword", typ: $funcType([ptrType$1], [], false)}, {prop: "highlightTextNode", name: "highlightTextNode", pkg: "overword", typ: $funcType([ptrType$1], [], false)}];
-	Config.init("", [{prop: "Words", name: "Words", embedded: false, exported: true, typ: sliceType, tag: ""}, {prop: "HighlightClass", name: "HighlightClass", embedded: false, exported: true, typ: $String, tag: ""}, {prop: "DebounceTime", name: "DebounceTime", embedded: false, exported: true, typ: $Int, tag: ""}]);
+	ptrType.methods = [{prop: "observeDOMChanges", name: "observeDOMChanges", pkg: "overword", typ: $funcType([], [], false)}, {prop: "debounceHighlight", name: "debounceHighlight", pkg: "overword", typ: $funcType([], [], false)}, {prop: "collectTextNodes", name: "collectTextNodes", pkg: "overword", typ: $funcType([ptrType$1, ptrType$2], [], false)}, {prop: "parseAndHighlight", name: "parseAndHighlight", pkg: "overword", typ: $funcType([ptrType$1], [], false)}, {prop: "highlightTextNode", name: "highlightTextNode", pkg: "overword", typ: $funcType([ptrType$1], [], false)}];
+	WordSet.init("", [{prop: "Name", name: "Name", embedded: false, exported: true, typ: $String, tag: "json:\"name\""}, {prop: "Words", name: "Words", embedded: false, exported: true, typ: sliceType$1, tag: "json:\"words\""}, {prop: "BackgroundColor", name: "BackgroundColor", embedded: false, exported: true, typ: $String, tag: "json:\"backgroundColor\""}, {prop: "TextColor", name: "TextColor", embedded: false, exported: true, typ: $String, tag: "json:\"textColor\""}]);
+	Config.init("", [{prop: "WordSets", name: "WordSets", embedded: false, exported: true, typ: sliceType$2, tag: ""}, {prop: "HighlightClass", name: "HighlightClass", embedded: false, exported: true, typ: $String, tag: ""}, {prop: "DebounceTime", name: "DebounceTime", embedded: false, exported: true, typ: $Int, tag: ""}]);
 	Highlighter.init("overword", [{prop: "config", name: "config", embedded: false, exported: false, typ: Config, tag: ""}, {prop: "observer", name: "observer", embedded: false, exported: false, typ: ptrType$1, tag: ""}, {prop: "debounceID", name: "debounceID", embedded: false, exported: false, typ: ptrType$1, tag: ""}]);
-	Match.init("", [{prop: "Start", name: "Start", embedded: false, exported: true, typ: $Int, tag: ""}, {prop: "End", name: "End", embedded: false, exported: true, typ: $Int, tag: ""}, {prop: "Word", name: "Word", embedded: false, exported: true, typ: $String, tag: ""}]);
+	Match.init("", [{prop: "Start", name: "Start", embedded: false, exported: true, typ: $Int, tag: ""}, {prop: "End", name: "End", embedded: false, exported: true, typ: $Int, tag: ""}, {prop: "Word", name: "Word", embedded: false, exported: true, typ: $String, tag: ""}, {prop: "WordSet", name: "WordSet", embedded: false, exported: true, typ: WordSet, tag: ""}]);
 	$init = function() {
 		$pkg.$init = function() {};
 		/* */ var $f, $c = false, $s = 0, $r; if (this !== undefined && this.$blk !== undefined) { $f = this; $c = true; $s = $f.$s; $r = $f.$r; } s: while (true) { switch ($s) { case 0:
 		$r = js.$init(); /* */ $s = 1; case 1: if($c) { $c = false; $r = $r.$blk(); } if ($r && $r.$blk !== undefined) { break s; }
 		$r = sort.$init(); /* */ $s = 2; case 2: if($c) { $c = false; $r = $r.$blk(); } if ($r && $r.$blk !== undefined) { break s; }
-		$r = strings.$init(); /* */ $s = 3; case 3: if($c) { $c = false; $r = $r.$blk(); } if ($r && $r.$blk !== undefined) { break s; }
+		$r = strconv.$init(); /* */ $s = 3; case 3: if($c) { $c = false; $r = $r.$blk(); } if ($r && $r.$blk !== undefined) { break s; }
+		$r = strings.$init(); /* */ $s = 4; case 4: if($c) { $c = false; $r = $r.$blk(); } if ($r && $r.$blk !== undefined) { break s; }
 		highlighter = ptrType.nil;
+		unsafeWindow = null;
+		console = null;
+		gmConfig = null;
 		if ($pkg === $mainPkg) {
 			main();
 			$mainFinished = true;

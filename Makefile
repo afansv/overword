@@ -4,6 +4,6 @@ toolset:
 
 build:
 	bd exec gopherjs build
-	cat header.txt overword.js > overword_tmp.js
+	cat header.js overword.js > overword_tmp.js
 	mv overword_tmp.js dist/overword.js
 	rm overword.js
