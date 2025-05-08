@@ -6825,7 +6825,7 @@ $packages["strings"] = (function() {
 	return $pkg;
 })();
 $packages["overword"] = (function() {
-	var $pkg = {}, $init, js, sort, strings, Highlighter, WordSet, Config, Match, ptrType, structType, sliceType, ptrType$1, sliceType$2, ptrType$2, mapType, funcType, ptrType$3, sliceType$3, ptrType$4, sliceType$4, sliceType$5, funcType$1, highlighter, body, unsafeWindow, console, gmConfig, predefinedSets, main, initHighlighter, containsHighlightClass, hasDescendantWithClass, addDefaultCSS, removeHighlights, init, parseWords;
+	var $pkg = {}, $init, js, sort, strings, Highlighter, WordSet, Config, Match, ptrType, structType, sliceType, ptrType$1, sliceType$2, ptrType$2, mapType, ptrType$3, sliceType$3, ptrType$4, sliceType$4, sliceType$5, funcType, funcType$1, highlighter, body, unsafeWindow, console, gmConfig, predefinedSets, main, initHighlighter, hasConnectedNodes, containsHighlightClass, hasDescendantWithClass, addDefaultCSS, removeHighlights, init, parseWords;
 	js = $packages["github.com/gopherjs/gopherjs/js"];
 	sort = $packages["sort"];
 	strings = $packages["strings"];
@@ -6890,13 +6890,13 @@ $packages["overword"] = (function() {
 	sliceType$2 = $sliceType(ptrType$1);
 	ptrType$2 = $ptrType(Config);
 	mapType = $mapType($String, $emptyInterface);
-	funcType = $funcType([], [], false);
 	ptrType$3 = $ptrType(js.Object);
 	sliceType$3 = $sliceType(ptrType$3);
 	ptrType$4 = $ptrType(sliceType$3);
 	sliceType$4 = $sliceType(Match);
 	sliceType$5 = $sliceType($String);
-	funcType$1 = $funcType([ptrType$3], [], false);
+	funcType = $funcType([ptrType$3], [], false);
+	funcType$1 = $funcType([], [], false);
 	main = function() {
 		var {$s, $r, $c} = $restore(this, {});
 		/* */ $s = $s || 0; s: while (true) { switch ($s) { case 0:
@@ -6928,7 +6928,7 @@ $packages["overword"] = (function() {
 		var cb, h;
 		h = this;
 		cb = js.MakeFunc((function(this$1, args) {
-			var args, i, record, records, this$1;
+			var _1, addedNodes, args, i, record, records, removedNodes, this$1;
 			records = (0 >= args.$length ? ($throwRuntimeError("index out of range"), undefined) : args.$array[args.$offset + 0]);
 			i = 0;
 			while (true) {
@@ -6942,15 +6942,42 @@ $packages["overword"] = (function() {
 					i = i + (1) >> 0;
 					continue;
 				}
+				_1 = $internalize(record.type, $String);
+				if (_1 === ("childList")) {
+					addedNodes = record.addedNodes;
+					removedNodes = record.removedNodes;
+					if (($parseInt(addedNodes.length) === 0) && !hasConnectedNodes(removedNodes)) {
+						i = i + (1) >> 0;
+						continue;
+					}
+				} else if (_1 === ("characterData")) {
+					if (!!!(record.target.isConnected)) {
+						i = i + (1) >> 0;
+						continue;
+					}
+				}
 				h.debounceHighlight();
 				break;
 			}
 			return $ifaceNil;
 		}));
 		h.observer = new ($global.MutationObserver)(cb);
-		h.observer.observe(body, $externalize($makeMap($String.keyFor, [{ k: "childList", v: new $Bool(true) }, { k: "subtree", v: new $Bool(true) }, { k: "characterData", v: new $Bool(true) }]), mapType));
+		h.observer.observe(body, $externalize($makeMap($String.keyFor, [{ k: "childList", v: new $Bool(true) }, { k: "subtree", v: new $Bool(true) }, { k: "characterData", v: new $Bool(true) }, { k: "characterDataOldValue", v: new $Bool(true) }]), mapType));
 	};
 	Highlighter.prototype.observeDOMChanges = function() { return this.$val.observeDOMChanges(); };
+	hasConnectedNodes = function(nodeList) {
+		var i, node, nodeList;
+		i = 0;
+		while (true) {
+			if (!(i < $parseInt(nodeList.length))) { break; }
+			node = nodeList[i];
+			if (!!(node.isConnected)) {
+				return true;
+			}
+			i = i + (1) >> 0;
+		}
+		return false;
+	};
 	containsHighlightClass = function(nodeList, className) {
 		var className, i, node, nodeList;
 		i = 0;
@@ -6976,20 +7003,29 @@ $packages["overword"] = (function() {
 		return !(found === null) && !(found === undefined);
 	};
 	Highlighter.ptr.prototype.debounceHighlight = function() {
-		var h;
+		var callback, h;
 		h = this;
-		if (!(h.debounceID === null)) {
-			$global.clearTimeout(h.debounceID);
-		}
-		h.debounceID = $global.setTimeout($externalize((function $b() {
-			var {$s, $r, $c} = $restore(this, {});
+		h.clearDebounce();
+		callback = js.MakeFunc((function $b(this$1, args) {
+			var {args, this$1, $s, $r, $c} = $restore(this, {this$1, args});
 			/* */ $s = $s || 0; s: while (true) { switch ($s) { case 0:
+			h.debounceID = null;
 			$r = h.parseAndHighlight(body, true); /* */ $s = 1; case 1: if($c) { $c = false; $r = $r.$blk(); } if ($r && $r.$blk !== undefined) { break s; }
-			$s = -1; return;
-			/* */ } return; } var $f = {$blk: $b, $c: true, $r, $s};return $f;
-		}), funcType), h.config.DebounceTime);
+			$s = -1; return $ifaceNil;
+			/* */ } return; } var $f = {$blk: $b, $c: true, $r, args, this$1, $s};return $f;
+		}));
+		h.debounceID = $global.setTimeout(callback, h.config.DebounceTime);
 	};
 	Highlighter.prototype.debounceHighlight = function() { return this.$val.debounceHighlight(); };
+	Highlighter.ptr.prototype.clearDebounce = function() {
+		var h;
+		h = this;
+		if (!(h.debounceID === null) && !(h.debounceID === undefined)) {
+			$global.clearTimeout(h.debounceID);
+			h.debounceID = null;
+		}
+	};
+	Highlighter.prototype.clearDebounce = function() { return this.$val.clearDebounce(); };
 	Highlighter.ptr.prototype.collectTextNodes = function(node, result) {
 		var {_r, child, children, h, i, node, nodeType, result, tag, $s, $r, $c} = $restore(this, {node, result});
 		/* */ $s = $s || 0; s: while (true) { switch ($s) { case 0:
@@ -7259,7 +7295,7 @@ $packages["overword"] = (function() {
 			$r = callback[0](); /* */ $s = 2; case 2: if($c) { $c = false; $r = $r.$blk(); } if ($r && $r.$blk !== undefined) { break s; }
 			$s = -1; return;
 			/* */ } return; } var $f = {$blk: $b, $c: true, $r, _r, e, prop, setCode, value, wordSet, $s};return $f;
-		}; })(callback, cfg), funcType$1));
+		}; })(callback, cfg), funcType));
 		$s = -1; return;
 		/* */ } return; } var $f = {$blk: Config.ptr.prototype.AddListener, $c: true, $r, callback, cfg, $s};return $f;
 	};
@@ -7292,8 +7328,8 @@ $packages["overword"] = (function() {
 		$s = -1; return strings.Split(value, ",");
 		/* */ } return; } var $f = {$blk: parseWords, $c: true, $r, _r, value, $s};return $f;
 	};
-	ptrType.methods = [{prop: "observeDOMChanges", name: "observeDOMChanges", pkg: "overword", typ: $funcType([], [], false)}, {prop: "debounceHighlight", name: "debounceHighlight", pkg: "overword", typ: $funcType([], [], false)}, {prop: "collectTextNodes", name: "collectTextNodes", pkg: "overword", typ: $funcType([ptrType$3, ptrType$4], [], false)}, {prop: "parseAndHighlight", name: "parseAndHighlight", pkg: "overword", typ: $funcType([ptrType$3, $Bool], [], false)}, {prop: "highlightTextNode", name: "highlightTextNode", pkg: "overword", typ: $funcType([ptrType$3], [], false)}];
-	ptrType$2.methods = [{prop: "Register", name: "Register", pkg: "", typ: $funcType([], [], false)}, {prop: "Load", name: "Load", pkg: "", typ: $funcType([], [], false)}, {prop: "AddListener", name: "AddListener", pkg: "", typ: $funcType([funcType], [], false)}, {prop: "findWordSet", name: "findWordSet", pkg: "overword", typ: $funcType([$String], [ptrType$1], false)}];
+	ptrType.methods = [{prop: "observeDOMChanges", name: "observeDOMChanges", pkg: "overword", typ: $funcType([], [], false)}, {prop: "debounceHighlight", name: "debounceHighlight", pkg: "overword", typ: $funcType([], [], false)}, {prop: "clearDebounce", name: "clearDebounce", pkg: "overword", typ: $funcType([], [], false)}, {prop: "collectTextNodes", name: "collectTextNodes", pkg: "overword", typ: $funcType([ptrType$3, ptrType$4], [], false)}, {prop: "parseAndHighlight", name: "parseAndHighlight", pkg: "overword", typ: $funcType([ptrType$3, $Bool], [], false)}, {prop: "highlightTextNode", name: "highlightTextNode", pkg: "overword", typ: $funcType([ptrType$3], [], false)}];
+	ptrType$2.methods = [{prop: "Register", name: "Register", pkg: "", typ: $funcType([], [], false)}, {prop: "Load", name: "Load", pkg: "", typ: $funcType([], [], false)}, {prop: "AddListener", name: "AddListener", pkg: "", typ: $funcType([funcType$1], [], false)}, {prop: "findWordSet", name: "findWordSet", pkg: "overword", typ: $funcType([$String], [ptrType$1], false)}];
 	Highlighter.init("overword", [{prop: "config", name: "config", embedded: false, exported: false, typ: ptrType$2, tag: ""}, {prop: "observer", name: "observer", embedded: false, exported: false, typ: ptrType$3, tag: ""}, {prop: "debounceID", name: "debounceID", embedded: false, exported: false, typ: ptrType$3, tag: ""}]);
 	WordSet.init("", [{prop: "Code", name: "Code", embedded: false, exported: true, typ: $String, tag: ""}, {prop: "Words", name: "Words", embedded: false, exported: true, typ: sliceType$5, tag: ""}, {prop: "BackgroundColor", name: "BackgroundColor", embedded: false, exported: true, typ: $String, tag: ""}, {prop: "TextColor", name: "TextColor", embedded: false, exported: true, typ: $String, tag: ""}]);
 	Config.init("overword", [{prop: "WordSets", name: "WordSets", embedded: false, exported: true, typ: sliceType$2, tag: ""}, {prop: "HighlightClass", name: "HighlightClass", embedded: false, exported: true, typ: $String, tag: ""}, {prop: "DebounceTime", name: "DebounceTime", embedded: false, exported: true, typ: $Int, tag: ""}, {prop: "gmc", name: "gmc", embedded: false, exported: false, typ: ptrType$3, tag: ""}]);

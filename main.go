@@ -36,6 +36,7 @@ func initHighlighter() {
 func (h *Highlighter) observeDOMChanges() {
 	cb := js.MakeFunc(func(this *js.Object, args []*js.Object) interface{} {
 		records := args[0]
+
 		for i := 0; i < records.Length(); i++ {
 			record := records.Index(i)
 			if containsHighlightClass(record.Get("addedNodes"), h.config.HighlightClass) {
@@ -44,17 +45,45 @@ func (h *Highlighter) observeDOMChanges() {
 			if containsHighlightClass(record.Get("removedNodes"), h.config.HighlightClass) {
 				continue
 			}
+
+			switch record.Get("type").String() {
+			case "childList":
+				addedNodes := record.Get("addedNodes")
+				removedNodes := record.Get("removedNodes")
+				// nothing added + removed nodes not in DOM anymore
+				if addedNodes.Length() == 0 && !hasConnectedNodes(removedNodes) {
+					continue
+				}
+			case "characterData":
+				// text node not in DOM anymore
+				if !record.Get("target").Get("isConnected").Bool() {
+					continue
+				}
+			}
+
 			h.debounceHighlight()
 			break
 		}
 		return nil
 	})
+
 	h.observer = js.Global.Get("MutationObserver").New(cb)
 	h.observer.Call("observe", body, map[string]interface{}{
-		"childList":     true,
-		"subtree":       true,
-		"characterData": true,
+		"childList":             true,
+		"subtree":               true,
+		"characterData":         true,
+		"characterDataOldValue": true,
 	})
+}
+
+func hasConnectedNodes(nodeList *js.Object) bool {
+	for i := 0; i < nodeList.Length(); i++ {
+		node := nodeList.Index(i)
+		if node.Get("isConnected").Bool() {
+			return true
+		}
+	}
+	return false
 }
 
 func containsHighlightClass(nodeList *js.Object, className string) bool {
@@ -79,12 +108,22 @@ func hasDescendantWithClass(node *js.Object, className string) bool {
 }
 
 func (h *Highlighter) debounceHighlight() {
-	if h.debounceID != nil {
-		js.Global.Get("clearTimeout").Invoke(h.debounceID)
-	}
-	h.debounceID = js.Global.Get("setTimeout").Invoke(func() {
+	h.clearDebounce()
+
+	callback := js.MakeFunc(func(this *js.Object, args []*js.Object) interface{} {
+		h.debounceID = nil
 		h.parseAndHighlight(body, true)
-	}, h.config.DebounceTime)
+		return nil
+	})
+
+	h.debounceID = js.Global.Call("setTimeout", callback, h.config.DebounceTime)
+}
+
+func (h *Highlighter) clearDebounce() {
+	if h.debounceID != nil && h.debounceID != js.Undefined {
+		js.Global.Call("clearTimeout", h.debounceID)
+		h.debounceID = nil
+	}
 }
 
 func (h *Highlighter) collectTextNodes(node *js.Object, result *[]*js.Object) {
