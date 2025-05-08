@@ -1,13 +1,34 @@
 // ==UserScript==
-// @name         New Userscript
+// @name         [Overword] - auto find words on page
 // @namespace    http://tampermonkey.net/
-// @version      2025-05-07
-// @description  try to take over the world!
-// @author       You
+// @version      2025-05-08
+// @description  Небольшое расширение, которое осуществляет автоматический поиск слов на странице
+// @author       afansv
+// @match        https://*/*
 // @match        http://*/*
-// @icon         data:image/gif;base64,R0lGODlhAQABAAAAACH5BAEKAAEALAAAAAABAAEAAAICTAEAOw==
-// @grant        none
+// @icon         https://raw.githubusercontent.com/afansv/overword/master/images/favicon.ico
+// @grant        GM_setValue
+// @grant        GM_getValue
+// @grant        GM_deleteValue
+// @grant        GM_registerMenuCommand
+// @grant        GM_unregisterMenuCommand
+// @grant        GM_addValueChangeListener
+// @grant        unsafeWindow
+// @homepageURL  https://github.com/afansv/overword
+// @updateURL    https://raw.githubusercontent.com/afansv/overword/master/dist/overword.user.js
+// @downloadURL  https://raw.githubusercontent.com/afansv/overword/master/dist/overword.user.js
+// @supportURL   https://github.com/afansv/overword/issues
+// @require      https://github.com/PRO-2684/GM_config/releases/download/v1.2.1/config.min.js#md5=525526b8f0b6b8606cedf08c651163c2
 // ==/UserScript==
+
+(function() {
+    'use strict';
+    if (typeof GM_config !== 'undefined') {
+        unsafeWindow.GM_config = GM_config;
+    }
+})();
+
+// gopher.js
 
 "use strict";
 (function() {
@@ -5783,7 +5804,7 @@ $packages["io"] = (function() {
 	return $pkg;
 })();
 $packages["unicode"] = (function() {
-	var $pkg = {}, $init, RangeTable, Range16, Range32, CaseRange, d, sliceType, sliceType$1, sliceType$3, arrayType, _White_Space, _CaseRanges, is16, is32, isExcludingLatin, To, ToLower, IsSpace, to;
+	var $pkg = {}, $init, RangeTable, Range16, Range32, CaseRange, d, sliceType, sliceType$1, sliceType$3, arrayType, _L, _Nd, _White_Space, _CaseRanges, properties, is16, is32, isExcludingLatin, To, ToLower, ToTitle, IsLetter, IsSpace, IsDigit, to;
 	RangeTable = $pkg.RangeTable = $newType(0, $kindStruct, "unicode.RangeTable", true, "unicode", true, function(R16_, R32_, LatinOffset_) {
 		this.$val = this;
 		if (arguments.length === 0) {
@@ -5940,6 +5961,25 @@ $packages["unicode"] = (function() {
 		return To(1, r);
 	};
 	$pkg.ToLower = ToLower;
+	ToTitle = function(r) {
+		var r;
+		if (r <= 127) {
+			if (97 <= r && r <= 122) {
+				r = r - (32) >> 0;
+			}
+			return r;
+		}
+		return To(2, r);
+	};
+	$pkg.ToTitle = ToTitle;
+	IsLetter = function(r) {
+		var r, x;
+		if (((r >>> 0)) <= 255) {
+			return !(((((x = ((r << 24 >>> 24)), ((x < 0 || x >= properties.length) ? ($throwRuntimeError("index out of range"), undefined) : properties[x])) & 96) >>> 0) === 0));
+		}
+		return isExcludingLatin($pkg.Letter, r);
+	};
+	$pkg.IsLetter = IsLetter;
 	IsSpace = function(r) {
 		var _1, r;
 		if (((r >>> 0)) <= 255) {
@@ -5952,6 +5992,14 @@ $packages["unicode"] = (function() {
 		return isExcludingLatin($pkg.White_Space, r);
 	};
 	$pkg.IsSpace = IsSpace;
+	IsDigit = function(r) {
+		var r;
+		if (r <= 255) {
+			return 48 <= r && r <= 57;
+		}
+		return isExcludingLatin($pkg.Digit, r);
+	};
+	$pkg.IsDigit = IsDigit;
 	to = function(_case, r, caseRange) {
 		var _case, _q, _tmp, _tmp$1, _tmp$2, _tmp$3, _tmp$4, _tmp$5, _tmp$6, _tmp$7, caseRange, cr, delta, foundMapping, hi, lo, m, mappedRune, r, x;
 		mappedRune = 0;
@@ -6004,17 +6052,22 @@ $packages["unicode"] = (function() {
 	$init = function() {
 		$pkg.$init = function() {};
 		/* */ var $f, $c = false, $s = 0, $r; if (this !== undefined && this.$blk !== undefined) { $f = this; $c = true; $s = $f.$s; $r = $f.$r; } s: while (true) { switch ($s) { case 0:
+		_L = new RangeTable.ptr(new sliceType([$clone(new Range16.ptr(65, 90, 1), Range16), $clone(new Range16.ptr(97, 122, 1), Range16), $clone(new Range16.ptr(170, 181, 11), Range16), $clone(new Range16.ptr(186, 192, 6), Range16), $clone(new Range16.ptr(193, 214, 1), Range16), $clone(new Range16.ptr(216, 246, 1), Range16), $clone(new Range16.ptr(248, 705, 1), Range16), $clone(new Range16.ptr(710, 721, 1), Range16), $clone(new Range16.ptr(736, 740, 1), Range16), $clone(new Range16.ptr(748, 750, 2), Range16), $clone(new Range16.ptr(880, 884, 1), Range16), $clone(new Range16.ptr(886, 887, 1), Range16), $clone(new Range16.ptr(890, 893, 1), Range16), $clone(new Range16.ptr(895, 902, 7), Range16), $clone(new Range16.ptr(904, 906, 1), Range16), $clone(new Range16.ptr(908, 910, 2), Range16), $clone(new Range16.ptr(911, 929, 1), Range16), $clone(new Range16.ptr(931, 1013, 1), Range16), $clone(new Range16.ptr(1015, 1153, 1), Range16), $clone(new Range16.ptr(1162, 1327, 1), Range16), $clone(new Range16.ptr(1329, 1366, 1), Range16), $clone(new Range16.ptr(1369, 1376, 7), Range16), $clone(new Range16.ptr(1377, 1416, 1), Range16), $clone(new Range16.ptr(1488, 1514, 1), Range16), $clone(new Range16.ptr(1519, 1522, 1), Range16), $clone(new Range16.ptr(1568, 1610, 1), Range16), $clone(new Range16.ptr(1646, 1647, 1), Range16), $clone(new Range16.ptr(1649, 1747, 1), Range16), $clone(new Range16.ptr(1749, 1765, 16), Range16), $clone(new Range16.ptr(1766, 1774, 8), Range16), $clone(new Range16.ptr(1775, 1786, 11), Range16), $clone(new Range16.ptr(1787, 1788, 1), Range16), $clone(new Range16.ptr(1791, 1808, 17), Range16), $clone(new Range16.ptr(1810, 1839, 1), Range16), $clone(new Range16.ptr(1869, 1957, 1), Range16), $clone(new Range16.ptr(1969, 1994, 25), Range16), $clone(new Range16.ptr(1995, 2026, 1), Range16), $clone(new Range16.ptr(2036, 2037, 1), Range16), $clone(new Range16.ptr(2042, 2048, 6), Range16), $clone(new Range16.ptr(2049, 2069, 1), Range16), $clone(new Range16.ptr(2074, 2084, 10), Range16), $clone(new Range16.ptr(2088, 2112, 24), Range16), $clone(new Range16.ptr(2113, 2136, 1), Range16), $clone(new Range16.ptr(2144, 2154, 1), Range16), $clone(new Range16.ptr(2208, 2228, 1), Range16), $clone(new Range16.ptr(2230, 2247, 1), Range16), $clone(new Range16.ptr(2308, 2361, 1), Range16), $clone(new Range16.ptr(2365, 2384, 19), Range16), $clone(new Range16.ptr(2392, 2401, 1), Range16), $clone(new Range16.ptr(2417, 2432, 1), Range16), $clone(new Range16.ptr(2437, 2444, 1), Range16), $clone(new Range16.ptr(2447, 2448, 1), Range16), $clone(new Range16.ptr(2451, 2472, 1), Range16), $clone(new Range16.ptr(2474, 2480, 1), Range16), $clone(new Range16.ptr(2482, 2486, 4), Range16), $clone(new Range16.ptr(2487, 2489, 1), Range16), $clone(new Range16.ptr(2493, 2510, 17), Range16), $clone(new Range16.ptr(2524, 2525, 1), Range16), $clone(new Range16.ptr(2527, 2529, 1), Range16), $clone(new Range16.ptr(2544, 2545, 1), Range16), $clone(new Range16.ptr(2556, 2565, 9), Range16), $clone(new Range16.ptr(2566, 2570, 1), Range16), $clone(new Range16.ptr(2575, 2576, 1), Range16), $clone(new Range16.ptr(2579, 2600, 1), Range16), $clone(new Range16.ptr(2602, 2608, 1), Range16), $clone(new Range16.ptr(2610, 2611, 1), Range16), $clone(new Range16.ptr(2613, 2614, 1), Range16), $clone(new Range16.ptr(2616, 2617, 1), Range16), $clone(new Range16.ptr(2649, 2652, 1), Range16), $clone(new Range16.ptr(2654, 2674, 20), Range16), $clone(new Range16.ptr(2675, 2676, 1), Range16), $clone(new Range16.ptr(2693, 2701, 1), Range16), $clone(new Range16.ptr(2703, 2705, 1), Range16), $clone(new Range16.ptr(2707, 2728, 1), Range16), $clone(new Range16.ptr(2730, 2736, 1), Range16), $clone(new Range16.ptr(2738, 2739, 1), Range16), $clone(new Range16.ptr(2741, 2745, 1), Range16), $clone(new Range16.ptr(2749, 2768, 19), Range16), $clone(new Range16.ptr(2784, 2785, 1), Range16), $clone(new Range16.ptr(2809, 2821, 12), Range16), $clone(new Range16.ptr(2822, 2828, 1), Range16), $clone(new Range16.ptr(2831, 2832, 1), Range16), $clone(new Range16.ptr(2835, 2856, 1), Range16), $clone(new Range16.ptr(2858, 2864, 1), Range16), $clone(new Range16.ptr(2866, 2867, 1), Range16), $clone(new Range16.ptr(2869, 2873, 1), Range16), $clone(new Range16.ptr(2877, 2908, 31), Range16), $clone(new Range16.ptr(2909, 2911, 2), Range16), $clone(new Range16.ptr(2912, 2913, 1), Range16), $clone(new Range16.ptr(2929, 2947, 18), Range16), $clone(new Range16.ptr(2949, 2954, 1), Range16), $clone(new Range16.ptr(2958, 2960, 1), Range16), $clone(new Range16.ptr(2962, 2965, 1), Range16), $clone(new Range16.ptr(2969, 2970, 1), Range16), $clone(new Range16.ptr(2972, 2974, 2), Range16), $clone(new Range16.ptr(2975, 2979, 4), Range16), $clone(new Range16.ptr(2980, 2984, 4), Range16), $clone(new Range16.ptr(2985, 2986, 1), Range16), $clone(new Range16.ptr(2990, 3001, 1), Range16), $clone(new Range16.ptr(3024, 3077, 53), Range16), $clone(new Range16.ptr(3078, 3084, 1), Range16), $clone(new Range16.ptr(3086, 3088, 1), Range16), $clone(new Range16.ptr(3090, 3112, 1), Range16), $clone(new Range16.ptr(3114, 3129, 1), Range16), $clone(new Range16.ptr(3133, 3160, 27), Range16), $clone(new Range16.ptr(3161, 3162, 1), Range16), $clone(new Range16.ptr(3168, 3169, 1), Range16), $clone(new Range16.ptr(3200, 3205, 5), Range16), $clone(new Range16.ptr(3206, 3212, 1), Range16), $clone(new Range16.ptr(3214, 3216, 1), Range16), $clone(new Range16.ptr(3218, 3240, 1), Range16), $clone(new Range16.ptr(3242, 3251, 1), Range16), $clone(new Range16.ptr(3253, 3257, 1), Range16), $clone(new Range16.ptr(3261, 3294, 33), Range16), $clone(new Range16.ptr(3296, 3297, 1), Range16), $clone(new Range16.ptr(3313, 3314, 1), Range16), $clone(new Range16.ptr(3332, 3340, 1), Range16), $clone(new Range16.ptr(3342, 3344, 1), Range16), $clone(new Range16.ptr(3346, 3386, 1), Range16), $clone(new Range16.ptr(3389, 3406, 17), Range16), $clone(new Range16.ptr(3412, 3414, 1), Range16), $clone(new Range16.ptr(3423, 3425, 1), Range16), $clone(new Range16.ptr(3450, 3455, 1), Range16), $clone(new Range16.ptr(3461, 3478, 1), Range16), $clone(new Range16.ptr(3482, 3505, 1), Range16), $clone(new Range16.ptr(3507, 3515, 1), Range16), $clone(new Range16.ptr(3517, 3520, 3), Range16), $clone(new Range16.ptr(3521, 3526, 1), Range16), $clone(new Range16.ptr(3585, 3632, 1), Range16), $clone(new Range16.ptr(3634, 3635, 1), Range16), $clone(new Range16.ptr(3648, 3654, 1), Range16), $clone(new Range16.ptr(3713, 3714, 1), Range16), $clone(new Range16.ptr(3716, 3718, 2), Range16), $clone(new Range16.ptr(3719, 3722, 1), Range16), $clone(new Range16.ptr(3724, 3747, 1), Range16), $clone(new Range16.ptr(3749, 3751, 2), Range16), $clone(new Range16.ptr(3752, 3760, 1), Range16), $clone(new Range16.ptr(3762, 3763, 1), Range16), $clone(new Range16.ptr(3773, 3776, 3), Range16), $clone(new Range16.ptr(3777, 3780, 1), Range16), $clone(new Range16.ptr(3782, 3804, 22), Range16), $clone(new Range16.ptr(3805, 3807, 1), Range16), $clone(new Range16.ptr(3840, 3904, 64), Range16), $clone(new Range16.ptr(3905, 3911, 1), Range16), $clone(new Range16.ptr(3913, 3948, 1), Range16), $clone(new Range16.ptr(3976, 3980, 1), Range16), $clone(new Range16.ptr(4096, 4138, 1), Range16), $clone(new Range16.ptr(4159, 4176, 17), Range16), $clone(new Range16.ptr(4177, 4181, 1), Range16), $clone(new Range16.ptr(4186, 4189, 1), Range16), $clone(new Range16.ptr(4193, 4197, 4), Range16), $clone(new Range16.ptr(4198, 4206, 8), Range16), $clone(new Range16.ptr(4207, 4208, 1), Range16), $clone(new Range16.ptr(4213, 4225, 1), Range16), $clone(new Range16.ptr(4238, 4256, 18), Range16), $clone(new Range16.ptr(4257, 4293, 1), Range16), $clone(new Range16.ptr(4295, 4301, 6), Range16), $clone(new Range16.ptr(4304, 4346, 1), Range16), $clone(new Range16.ptr(4348, 4680, 1), Range16), $clone(new Range16.ptr(4682, 4685, 1), Range16), $clone(new Range16.ptr(4688, 4694, 1), Range16), $clone(new Range16.ptr(4696, 4698, 2), Range16), $clone(new Range16.ptr(4699, 4701, 1), Range16), $clone(new Range16.ptr(4704, 4744, 1), Range16), $clone(new Range16.ptr(4746, 4749, 1), Range16), $clone(new Range16.ptr(4752, 4784, 1), Range16), $clone(new Range16.ptr(4786, 4789, 1), Range16), $clone(new Range16.ptr(4792, 4798, 1), Range16), $clone(new Range16.ptr(4800, 4802, 2), Range16), $clone(new Range16.ptr(4803, 4805, 1), Range16), $clone(new Range16.ptr(4808, 4822, 1), Range16), $clone(new Range16.ptr(4824, 4880, 1), Range16), $clone(new Range16.ptr(4882, 4885, 1), Range16), $clone(new Range16.ptr(4888, 4954, 1), Range16), $clone(new Range16.ptr(4992, 5007, 1), Range16), $clone(new Range16.ptr(5024, 5109, 1), Range16), $clone(new Range16.ptr(5112, 5117, 1), Range16), $clone(new Range16.ptr(5121, 5740, 1), Range16), $clone(new Range16.ptr(5743, 5759, 1), Range16), $clone(new Range16.ptr(5761, 5786, 1), Range16), $clone(new Range16.ptr(5792, 5866, 1), Range16), $clone(new Range16.ptr(5873, 5880, 1), Range16), $clone(new Range16.ptr(5888, 5900, 1), Range16), $clone(new Range16.ptr(5902, 5905, 1), Range16), $clone(new Range16.ptr(5920, 5937, 1), Range16), $clone(new Range16.ptr(5952, 5969, 1), Range16), $clone(new Range16.ptr(5984, 5996, 1), Range16), $clone(new Range16.ptr(5998, 6000, 1), Range16), $clone(new Range16.ptr(6016, 6067, 1), Range16), $clone(new Range16.ptr(6103, 6108, 5), Range16), $clone(new Range16.ptr(6176, 6264, 1), Range16), $clone(new Range16.ptr(6272, 6276, 1), Range16), $clone(new Range16.ptr(6279, 6312, 1), Range16), $clone(new Range16.ptr(6314, 6320, 6), Range16), $clone(new Range16.ptr(6321, 6389, 1), Range16), $clone(new Range16.ptr(6400, 6430, 1), Range16), $clone(new Range16.ptr(6480, 6509, 1), Range16), $clone(new Range16.ptr(6512, 6516, 1), Range16), $clone(new Range16.ptr(6528, 6571, 1), Range16), $clone(new Range16.ptr(6576, 6601, 1), Range16), $clone(new Range16.ptr(6656, 6678, 1), Range16), $clone(new Range16.ptr(6688, 6740, 1), Range16), $clone(new Range16.ptr(6823, 6917, 94), Range16), $clone(new Range16.ptr(6918, 6963, 1), Range16), $clone(new Range16.ptr(6981, 6987, 1), Range16), $clone(new Range16.ptr(7043, 7072, 1), Range16), $clone(new Range16.ptr(7086, 7087, 1), Range16), $clone(new Range16.ptr(7098, 7141, 1), Range16), $clone(new Range16.ptr(7168, 7203, 1), Range16), $clone(new Range16.ptr(7245, 7247, 1), Range16), $clone(new Range16.ptr(7258, 7293, 1), Range16), $clone(new Range16.ptr(7296, 7304, 1), Range16), $clone(new Range16.ptr(7312, 7354, 1), Range16), $clone(new Range16.ptr(7357, 7359, 1), Range16), $clone(new Range16.ptr(7401, 7404, 1), Range16), $clone(new Range16.ptr(7406, 7411, 1), Range16), $clone(new Range16.ptr(7413, 7414, 1), Range16), $clone(new Range16.ptr(7418, 7424, 6), Range16), $clone(new Range16.ptr(7425, 7615, 1), Range16), $clone(new Range16.ptr(7680, 7957, 1), Range16), $clone(new Range16.ptr(7960, 7965, 1), Range16), $clone(new Range16.ptr(7968, 8005, 1), Range16), $clone(new Range16.ptr(8008, 8013, 1), Range16), $clone(new Range16.ptr(8016, 8023, 1), Range16), $clone(new Range16.ptr(8025, 8031, 2), Range16), $clone(new Range16.ptr(8032, 8061, 1), Range16), $clone(new Range16.ptr(8064, 8116, 1), Range16), $clone(new Range16.ptr(8118, 8124, 1), Range16), $clone(new Range16.ptr(8126, 8130, 4), Range16), $clone(new Range16.ptr(8131, 8132, 1), Range16), $clone(new Range16.ptr(8134, 8140, 1), Range16), $clone(new Range16.ptr(8144, 8147, 1), Range16), $clone(new Range16.ptr(8150, 8155, 1), Range16), $clone(new Range16.ptr(8160, 8172, 1), Range16), $clone(new Range16.ptr(8178, 8180, 1), Range16), $clone(new Range16.ptr(8182, 8188, 1), Range16), $clone(new Range16.ptr(8305, 8319, 14), Range16), $clone(new Range16.ptr(8336, 8348, 1), Range16), $clone(new Range16.ptr(8450, 8455, 5), Range16), $clone(new Range16.ptr(8458, 8467, 1), Range16), $clone(new Range16.ptr(8469, 8473, 4), Range16), $clone(new Range16.ptr(8474, 8477, 1), Range16), $clone(new Range16.ptr(8484, 8490, 2), Range16), $clone(new Range16.ptr(8491, 8493, 1), Range16), $clone(new Range16.ptr(8495, 8505, 1), Range16), $clone(new Range16.ptr(8508, 8511, 1), Range16), $clone(new Range16.ptr(8517, 8521, 1), Range16), $clone(new Range16.ptr(8526, 8579, 53), Range16), $clone(new Range16.ptr(8580, 11264, 2684), Range16), $clone(new Range16.ptr(11265, 11310, 1), Range16), $clone(new Range16.ptr(11312, 11358, 1), Range16), $clone(new Range16.ptr(11360, 11492, 1), Range16), $clone(new Range16.ptr(11499, 11502, 1), Range16), $clone(new Range16.ptr(11506, 11507, 1), Range16), $clone(new Range16.ptr(11520, 11557, 1), Range16), $clone(new Range16.ptr(11559, 11565, 6), Range16), $clone(new Range16.ptr(11568, 11623, 1), Range16), $clone(new Range16.ptr(11631, 11648, 17), Range16), $clone(new Range16.ptr(11649, 11670, 1), Range16), $clone(new Range16.ptr(11680, 11686, 1), Range16), $clone(new Range16.ptr(11688, 11694, 1), Range16), $clone(new Range16.ptr(11696, 11702, 1), Range16), $clone(new Range16.ptr(11704, 11710, 1), Range16), $clone(new Range16.ptr(11712, 11718, 1), Range16), $clone(new Range16.ptr(11720, 11726, 1), Range16), $clone(new Range16.ptr(11728, 11734, 1), Range16), $clone(new Range16.ptr(11736, 11742, 1), Range16), $clone(new Range16.ptr(11823, 12293, 470), Range16), $clone(new Range16.ptr(12294, 12337, 43), Range16), $clone(new Range16.ptr(12338, 12341, 1), Range16), $clone(new Range16.ptr(12347, 12348, 1), Range16), $clone(new Range16.ptr(12353, 12438, 1), Range16), $clone(new Range16.ptr(12445, 12447, 1), Range16), $clone(new Range16.ptr(12449, 12538, 1), Range16), $clone(new Range16.ptr(12540, 12543, 1), Range16), $clone(new Range16.ptr(12549, 12591, 1), Range16), $clone(new Range16.ptr(12593, 12686, 1), Range16), $clone(new Range16.ptr(12704, 12735, 1), Range16), $clone(new Range16.ptr(12784, 12799, 1), Range16), $clone(new Range16.ptr(13312, 19903, 1), Range16), $clone(new Range16.ptr(19968, 40956, 1), Range16), $clone(new Range16.ptr(40960, 42124, 1), Range16), $clone(new Range16.ptr(42192, 42237, 1), Range16), $clone(new Range16.ptr(42240, 42508, 1), Range16), $clone(new Range16.ptr(42512, 42527, 1), Range16), $clone(new Range16.ptr(42538, 42539, 1), Range16), $clone(new Range16.ptr(42560, 42606, 1), Range16), $clone(new Range16.ptr(42623, 42653, 1), Range16), $clone(new Range16.ptr(42656, 42725, 1), Range16), $clone(new Range16.ptr(42775, 42783, 1), Range16), $clone(new Range16.ptr(42786, 42888, 1), Range16), $clone(new Range16.ptr(42891, 42943, 1), Range16), $clone(new Range16.ptr(42946, 42954, 1), Range16), $clone(new Range16.ptr(42997, 43009, 1), Range16), $clone(new Range16.ptr(43011, 43013, 1), Range16), $clone(new Range16.ptr(43015, 43018, 1), Range16), $clone(new Range16.ptr(43020, 43042, 1), Range16), $clone(new Range16.ptr(43072, 43123, 1), Range16), $clone(new Range16.ptr(43138, 43187, 1), Range16), $clone(new Range16.ptr(43250, 43255, 1), Range16), $clone(new Range16.ptr(43259, 43261, 2), Range16), $clone(new Range16.ptr(43262, 43274, 12), Range16), $clone(new Range16.ptr(43275, 43301, 1), Range16), $clone(new Range16.ptr(43312, 43334, 1), Range16), $clone(new Range16.ptr(43360, 43388, 1), Range16), $clone(new Range16.ptr(43396, 43442, 1), Range16), $clone(new Range16.ptr(43471, 43488, 17), Range16), $clone(new Range16.ptr(43489, 43492, 1), Range16), $clone(new Range16.ptr(43494, 43503, 1), Range16), $clone(new Range16.ptr(43514, 43518, 1), Range16), $clone(new Range16.ptr(43520, 43560, 1), Range16), $clone(new Range16.ptr(43584, 43586, 1), Range16), $clone(new Range16.ptr(43588, 43595, 1), Range16), $clone(new Range16.ptr(43616, 43638, 1), Range16), $clone(new Range16.ptr(43642, 43646, 4), Range16), $clone(new Range16.ptr(43647, 43695, 1), Range16), $clone(new Range16.ptr(43697, 43701, 4), Range16), $clone(new Range16.ptr(43702, 43705, 3), Range16), $clone(new Range16.ptr(43706, 43709, 1), Range16), $clone(new Range16.ptr(43712, 43714, 2), Range16), $clone(new Range16.ptr(43739, 43741, 1), Range16), $clone(new Range16.ptr(43744, 43754, 1), Range16), $clone(new Range16.ptr(43762, 43764, 1), Range16), $clone(new Range16.ptr(43777, 43782, 1), Range16), $clone(new Range16.ptr(43785, 43790, 1), Range16), $clone(new Range16.ptr(43793, 43798, 1), Range16), $clone(new Range16.ptr(43808, 43814, 1), Range16), $clone(new Range16.ptr(43816, 43822, 1), Range16), $clone(new Range16.ptr(43824, 43866, 1), Range16), $clone(new Range16.ptr(43868, 43881, 1), Range16), $clone(new Range16.ptr(43888, 44002, 1), Range16), $clone(new Range16.ptr(44032, 55203, 1), Range16), $clone(new Range16.ptr(55216, 55238, 1), Range16), $clone(new Range16.ptr(55243, 55291, 1), Range16), $clone(new Range16.ptr(63744, 64109, 1), Range16), $clone(new Range16.ptr(64112, 64217, 1), Range16), $clone(new Range16.ptr(64256, 64262, 1), Range16), $clone(new Range16.ptr(64275, 64279, 1), Range16), $clone(new Range16.ptr(64285, 64287, 2), Range16), $clone(new Range16.ptr(64288, 64296, 1), Range16), $clone(new Range16.ptr(64298, 64310, 1), Range16), $clone(new Range16.ptr(64312, 64316, 1), Range16), $clone(new Range16.ptr(64318, 64320, 2), Range16), $clone(new Range16.ptr(64321, 64323, 2), Range16), $clone(new Range16.ptr(64324, 64326, 2), Range16), $clone(new Range16.ptr(64327, 64433, 1), Range16), $clone(new Range16.ptr(64467, 64829, 1), Range16), $clone(new Range16.ptr(64848, 64911, 1), Range16), $clone(new Range16.ptr(64914, 64967, 1), Range16), $clone(new Range16.ptr(65008, 65019, 1), Range16), $clone(new Range16.ptr(65136, 65140, 1), Range16), $clone(new Range16.ptr(65142, 65276, 1), Range16), $clone(new Range16.ptr(65313, 65338, 1), Range16), $clone(new Range16.ptr(65345, 65370, 1), Range16), $clone(new Range16.ptr(65382, 65470, 1), Range16), $clone(new Range16.ptr(65474, 65479, 1), Range16), $clone(new Range16.ptr(65482, 65487, 1), Range16), $clone(new Range16.ptr(65490, 65495, 1), Range16), $clone(new Range16.ptr(65498, 65500, 1), Range16)]), new sliceType$1([$clone(new Range32.ptr(65536, 65547, 1), Range32), $clone(new Range32.ptr(65549, 65574, 1), Range32), $clone(new Range32.ptr(65576, 65594, 1), Range32), $clone(new Range32.ptr(65596, 65597, 1), Range32), $clone(new Range32.ptr(65599, 65613, 1), Range32), $clone(new Range32.ptr(65616, 65629, 1), Range32), $clone(new Range32.ptr(65664, 65786, 1), Range32), $clone(new Range32.ptr(66176, 66204, 1), Range32), $clone(new Range32.ptr(66208, 66256, 1), Range32), $clone(new Range32.ptr(66304, 66335, 1), Range32), $clone(new Range32.ptr(66349, 66368, 1), Range32), $clone(new Range32.ptr(66370, 66377, 1), Range32), $clone(new Range32.ptr(66384, 66421, 1), Range32), $clone(new Range32.ptr(66432, 66461, 1), Range32), $clone(new Range32.ptr(66464, 66499, 1), Range32), $clone(new Range32.ptr(66504, 66511, 1), Range32), $clone(new Range32.ptr(66560, 66717, 1), Range32), $clone(new Range32.ptr(66736, 66771, 1), Range32), $clone(new Range32.ptr(66776, 66811, 1), Range32), $clone(new Range32.ptr(66816, 66855, 1), Range32), $clone(new Range32.ptr(66864, 66915, 1), Range32), $clone(new Range32.ptr(67072, 67382, 1), Range32), $clone(new Range32.ptr(67392, 67413, 1), Range32), $clone(new Range32.ptr(67424, 67431, 1), Range32), $clone(new Range32.ptr(67584, 67589, 1), Range32), $clone(new Range32.ptr(67592, 67594, 2), Range32), $clone(new Range32.ptr(67595, 67637, 1), Range32), $clone(new Range32.ptr(67639, 67640, 1), Range32), $clone(new Range32.ptr(67644, 67647, 3), Range32), $clone(new Range32.ptr(67648, 67669, 1), Range32), $clone(new Range32.ptr(67680, 67702, 1), Range32), $clone(new Range32.ptr(67712, 67742, 1), Range32), $clone(new Range32.ptr(67808, 67826, 1), Range32), $clone(new Range32.ptr(67828, 67829, 1), Range32), $clone(new Range32.ptr(67840, 67861, 1), Range32), $clone(new Range32.ptr(67872, 67897, 1), Range32), $clone(new Range32.ptr(67968, 68023, 1), Range32), $clone(new Range32.ptr(68030, 68031, 1), Range32), $clone(new Range32.ptr(68096, 68112, 16), Range32), $clone(new Range32.ptr(68113, 68115, 1), Range32), $clone(new Range32.ptr(68117, 68119, 1), Range32), $clone(new Range32.ptr(68121, 68149, 1), Range32), $clone(new Range32.ptr(68192, 68220, 1), Range32), $clone(new Range32.ptr(68224, 68252, 1), Range32), $clone(new Range32.ptr(68288, 68295, 1), Range32), $clone(new Range32.ptr(68297, 68324, 1), Range32), $clone(new Range32.ptr(68352, 68405, 1), Range32), $clone(new Range32.ptr(68416, 68437, 1), Range32), $clone(new Range32.ptr(68448, 68466, 1), Range32), $clone(new Range32.ptr(68480, 68497, 1), Range32), $clone(new Range32.ptr(68608, 68680, 1), Range32), $clone(new Range32.ptr(68736, 68786, 1), Range32), $clone(new Range32.ptr(68800, 68850, 1), Range32), $clone(new Range32.ptr(68864, 68899, 1), Range32), $clone(new Range32.ptr(69248, 69289, 1), Range32), $clone(new Range32.ptr(69296, 69297, 1), Range32), $clone(new Range32.ptr(69376, 69404, 1), Range32), $clone(new Range32.ptr(69415, 69424, 9), Range32), $clone(new Range32.ptr(69425, 69445, 1), Range32), $clone(new Range32.ptr(69552, 69572, 1), Range32), $clone(new Range32.ptr(69600, 69622, 1), Range32), $clone(new Range32.ptr(69635, 69687, 1), Range32), $clone(new Range32.ptr(69763, 69807, 1), Range32), $clone(new Range32.ptr(69840, 69864, 1), Range32), $clone(new Range32.ptr(69891, 69926, 1), Range32), $clone(new Range32.ptr(69956, 69959, 3), Range32), $clone(new Range32.ptr(69968, 70002, 1), Range32), $clone(new Range32.ptr(70006, 70019, 13), Range32), $clone(new Range32.ptr(70020, 70066, 1), Range32), $clone(new Range32.ptr(70081, 70084, 1), Range32), $clone(new Range32.ptr(70106, 70108, 2), Range32), $clone(new Range32.ptr(70144, 70161, 1), Range32), $clone(new Range32.ptr(70163, 70187, 1), Range32), $clone(new Range32.ptr(70272, 70278, 1), Range32), $clone(new Range32.ptr(70280, 70282, 2), Range32), $clone(new Range32.ptr(70283, 70285, 1), Range32), $clone(new Range32.ptr(70287, 70301, 1), Range32), $clone(new Range32.ptr(70303, 70312, 1), Range32), $clone(new Range32.ptr(70320, 70366, 1), Range32), $clone(new Range32.ptr(70405, 70412, 1), Range32), $clone(new Range32.ptr(70415, 70416, 1), Range32), $clone(new Range32.ptr(70419, 70440, 1), Range32), $clone(new Range32.ptr(70442, 70448, 1), Range32), $clone(new Range32.ptr(70450, 70451, 1), Range32), $clone(new Range32.ptr(70453, 70457, 1), Range32), $clone(new Range32.ptr(70461, 70480, 19), Range32), $clone(new Range32.ptr(70493, 70497, 1), Range32), $clone(new Range32.ptr(70656, 70708, 1), Range32), $clone(new Range32.ptr(70727, 70730, 1), Range32), $clone(new Range32.ptr(70751, 70753, 1), Range32), $clone(new Range32.ptr(70784, 70831, 1), Range32), $clone(new Range32.ptr(70852, 70853, 1), Range32), $clone(new Range32.ptr(70855, 71040, 185), Range32), $clone(new Range32.ptr(71041, 71086, 1), Range32), $clone(new Range32.ptr(71128, 71131, 1), Range32), $clone(new Range32.ptr(71168, 71215, 1), Range32), $clone(new Range32.ptr(71236, 71296, 60), Range32), $clone(new Range32.ptr(71297, 71338, 1), Range32), $clone(new Range32.ptr(71352, 71424, 72), Range32), $clone(new Range32.ptr(71425, 71450, 1), Range32), $clone(new Range32.ptr(71680, 71723, 1), Range32), $clone(new Range32.ptr(71840, 71903, 1), Range32), $clone(new Range32.ptr(71935, 71942, 1), Range32), $clone(new Range32.ptr(71945, 71948, 3), Range32), $clone(new Range32.ptr(71949, 71955, 1), Range32), $clone(new Range32.ptr(71957, 71958, 1), Range32), $clone(new Range32.ptr(71960, 71983, 1), Range32), $clone(new Range32.ptr(71999, 72001, 2), Range32), $clone(new Range32.ptr(72096, 72103, 1), Range32), $clone(new Range32.ptr(72106, 72144, 1), Range32), $clone(new Range32.ptr(72161, 72163, 2), Range32), $clone(new Range32.ptr(72192, 72203, 11), Range32), $clone(new Range32.ptr(72204, 72242, 1), Range32), $clone(new Range32.ptr(72250, 72272, 22), Range32), $clone(new Range32.ptr(72284, 72329, 1), Range32), $clone(new Range32.ptr(72349, 72384, 35), Range32), $clone(new Range32.ptr(72385, 72440, 1), Range32), $clone(new Range32.ptr(72704, 72712, 1), Range32), $clone(new Range32.ptr(72714, 72750, 1), Range32), $clone(new Range32.ptr(72768, 72818, 50), Range32), $clone(new Range32.ptr(72819, 72847, 1), Range32), $clone(new Range32.ptr(72960, 72966, 1), Range32), $clone(new Range32.ptr(72968, 72969, 1), Range32), $clone(new Range32.ptr(72971, 73008, 1), Range32), $clone(new Range32.ptr(73030, 73056, 26), Range32), $clone(new Range32.ptr(73057, 73061, 1), Range32), $clone(new Range32.ptr(73063, 73064, 1), Range32), $clone(new Range32.ptr(73066, 73097, 1), Range32), $clone(new Range32.ptr(73112, 73440, 328), Range32), $clone(new Range32.ptr(73441, 73458, 1), Range32), $clone(new Range32.ptr(73648, 73728, 80), Range32), $clone(new Range32.ptr(73729, 74649, 1), Range32), $clone(new Range32.ptr(74880, 75075, 1), Range32), $clone(new Range32.ptr(77824, 78894, 1), Range32), $clone(new Range32.ptr(82944, 83526, 1), Range32), $clone(new Range32.ptr(92160, 92728, 1), Range32), $clone(new Range32.ptr(92736, 92766, 1), Range32), $clone(new Range32.ptr(92880, 92909, 1), Range32), $clone(new Range32.ptr(92928, 92975, 1), Range32), $clone(new Range32.ptr(92992, 92995, 1), Range32), $clone(new Range32.ptr(93027, 93047, 1), Range32), $clone(new Range32.ptr(93053, 93071, 1), Range32), $clone(new Range32.ptr(93760, 93823, 1), Range32), $clone(new Range32.ptr(93952, 94026, 1), Range32), $clone(new Range32.ptr(94032, 94099, 67), Range32), $clone(new Range32.ptr(94100, 94111, 1), Range32), $clone(new Range32.ptr(94176, 94177, 1), Range32), $clone(new Range32.ptr(94179, 94208, 29), Range32), $clone(new Range32.ptr(94209, 100343, 1), Range32), $clone(new Range32.ptr(100352, 101589, 1), Range32), $clone(new Range32.ptr(101632, 101640, 1), Range32), $clone(new Range32.ptr(110592, 110878, 1), Range32), $clone(new Range32.ptr(110928, 110930, 1), Range32), $clone(new Range32.ptr(110948, 110951, 1), Range32), $clone(new Range32.ptr(110960, 111355, 1), Range32), $clone(new Range32.ptr(113664, 113770, 1), Range32), $clone(new Range32.ptr(113776, 113788, 1), Range32), $clone(new Range32.ptr(113792, 113800, 1), Range32), $clone(new Range32.ptr(113808, 113817, 1), Range32), $clone(new Range32.ptr(119808, 119892, 1), Range32), $clone(new Range32.ptr(119894, 119964, 1), Range32), $clone(new Range32.ptr(119966, 119967, 1), Range32), $clone(new Range32.ptr(119970, 119973, 3), Range32), $clone(new Range32.ptr(119974, 119977, 3), Range32), $clone(new Range32.ptr(119978, 119980, 1), Range32), $clone(new Range32.ptr(119982, 119993, 1), Range32), $clone(new Range32.ptr(119995, 119997, 2), Range32), $clone(new Range32.ptr(119998, 120003, 1), Range32), $clone(new Range32.ptr(120005, 120069, 1), Range32), $clone(new Range32.ptr(120071, 120074, 1), Range32), $clone(new Range32.ptr(120077, 120084, 1), Range32), $clone(new Range32.ptr(120086, 120092, 1), Range32), $clone(new Range32.ptr(120094, 120121, 1), Range32), $clone(new Range32.ptr(120123, 120126, 1), Range32), $clone(new Range32.ptr(120128, 120132, 1), Range32), $clone(new Range32.ptr(120134, 120138, 4), Range32), $clone(new Range32.ptr(120139, 120144, 1), Range32), $clone(new Range32.ptr(120146, 120485, 1), Range32), $clone(new Range32.ptr(120488, 120512, 1), Range32), $clone(new Range32.ptr(120514, 120538, 1), Range32), $clone(new Range32.ptr(120540, 120570, 1), Range32), $clone(new Range32.ptr(120572, 120596, 1), Range32), $clone(new Range32.ptr(120598, 120628, 1), Range32), $clone(new Range32.ptr(120630, 120654, 1), Range32), $clone(new Range32.ptr(120656, 120686, 1), Range32), $clone(new Range32.ptr(120688, 120712, 1), Range32), $clone(new Range32.ptr(120714, 120744, 1), Range32), $clone(new Range32.ptr(120746, 120770, 1), Range32), $clone(new Range32.ptr(120772, 120779, 1), Range32), $clone(new Range32.ptr(123136, 123180, 1), Range32), $clone(new Range32.ptr(123191, 123197, 1), Range32), $clone(new Range32.ptr(123214, 123584, 370), Range32), $clone(new Range32.ptr(123585, 123627, 1), Range32), $clone(new Range32.ptr(124928, 125124, 1), Range32), $clone(new Range32.ptr(125184, 125251, 1), Range32), $clone(new Range32.ptr(125259, 126464, 1205), Range32), $clone(new Range32.ptr(126465, 126467, 1), Range32), $clone(new Range32.ptr(126469, 126495, 1), Range32), $clone(new Range32.ptr(126497, 126498, 1), Range32), $clone(new Range32.ptr(126500, 126503, 3), Range32), $clone(new Range32.ptr(126505, 126514, 1), Range32), $clone(new Range32.ptr(126516, 126519, 1), Range32), $clone(new Range32.ptr(126521, 126523, 2), Range32), $clone(new Range32.ptr(126530, 126535, 5), Range32), $clone(new Range32.ptr(126537, 126541, 2), Range32), $clone(new Range32.ptr(126542, 126543, 1), Range32), $clone(new Range32.ptr(126545, 126546, 1), Range32), $clone(new Range32.ptr(126548, 126551, 3), Range32), $clone(new Range32.ptr(126553, 126561, 2), Range32), $clone(new Range32.ptr(126562, 126564, 2), Range32), $clone(new Range32.ptr(126567, 126570, 1), Range32), $clone(new Range32.ptr(126572, 126578, 1), Range32), $clone(new Range32.ptr(126580, 126583, 1), Range32), $clone(new Range32.ptr(126585, 126588, 1), Range32), $clone(new Range32.ptr(126590, 126592, 2), Range32), $clone(new Range32.ptr(126593, 126601, 1), Range32), $clone(new Range32.ptr(126603, 126619, 1), Range32), $clone(new Range32.ptr(126625, 126627, 1), Range32), $clone(new Range32.ptr(126629, 126633, 1), Range32), $clone(new Range32.ptr(126635, 126651, 1), Range32), $clone(new Range32.ptr(131072, 173789, 1), Range32), $clone(new Range32.ptr(173824, 177972, 1), Range32), $clone(new Range32.ptr(177984, 178205, 1), Range32), $clone(new Range32.ptr(178208, 183969, 1), Range32), $clone(new Range32.ptr(183984, 191456, 1), Range32), $clone(new Range32.ptr(194560, 195101, 1), Range32), $clone(new Range32.ptr(196608, 201546, 1), Range32)]), 6);
+		_Nd = new RangeTable.ptr(new sliceType([$clone(new Range16.ptr(48, 57, 1), Range16), $clone(new Range16.ptr(1632, 1641, 1), Range16), $clone(new Range16.ptr(1776, 1785, 1), Range16), $clone(new Range16.ptr(1984, 1993, 1), Range16), $clone(new Range16.ptr(2406, 2415, 1), Range16), $clone(new Range16.ptr(2534, 2543, 1), Range16), $clone(new Range16.ptr(2662, 2671, 1), Range16), $clone(new Range16.ptr(2790, 2799, 1), Range16), $clone(new Range16.ptr(2918, 2927, 1), Range16), $clone(new Range16.ptr(3046, 3055, 1), Range16), $clone(new Range16.ptr(3174, 3183, 1), Range16), $clone(new Range16.ptr(3302, 3311, 1), Range16), $clone(new Range16.ptr(3430, 3439, 1), Range16), $clone(new Range16.ptr(3558, 3567, 1), Range16), $clone(new Range16.ptr(3664, 3673, 1), Range16), $clone(new Range16.ptr(3792, 3801, 1), Range16), $clone(new Range16.ptr(3872, 3881, 1), Range16), $clone(new Range16.ptr(4160, 4169, 1), Range16), $clone(new Range16.ptr(4240, 4249, 1), Range16), $clone(new Range16.ptr(6112, 6121, 1), Range16), $clone(new Range16.ptr(6160, 6169, 1), Range16), $clone(new Range16.ptr(6470, 6479, 1), Range16), $clone(new Range16.ptr(6608, 6617, 1), Range16), $clone(new Range16.ptr(6784, 6793, 1), Range16), $clone(new Range16.ptr(6800, 6809, 1), Range16), $clone(new Range16.ptr(6992, 7001, 1), Range16), $clone(new Range16.ptr(7088, 7097, 1), Range16), $clone(new Range16.ptr(7232, 7241, 1), Range16), $clone(new Range16.ptr(7248, 7257, 1), Range16), $clone(new Range16.ptr(42528, 42537, 1), Range16), $clone(new Range16.ptr(43216, 43225, 1), Range16), $clone(new Range16.ptr(43264, 43273, 1), Range16), $clone(new Range16.ptr(43472, 43481, 1), Range16), $clone(new Range16.ptr(43504, 43513, 1), Range16), $clone(new Range16.ptr(43600, 43609, 1), Range16), $clone(new Range16.ptr(44016, 44025, 1), Range16), $clone(new Range16.ptr(65296, 65305, 1), Range16)]), new sliceType$1([$clone(new Range32.ptr(66720, 66729, 1), Range32), $clone(new Range32.ptr(68912, 68921, 1), Range32), $clone(new Range32.ptr(69734, 69743, 1), Range32), $clone(new Range32.ptr(69872, 69881, 1), Range32), $clone(new Range32.ptr(69942, 69951, 1), Range32), $clone(new Range32.ptr(70096, 70105, 1), Range32), $clone(new Range32.ptr(70384, 70393, 1), Range32), $clone(new Range32.ptr(70736, 70745, 1), Range32), $clone(new Range32.ptr(70864, 70873, 1), Range32), $clone(new Range32.ptr(71248, 71257, 1), Range32), $clone(new Range32.ptr(71360, 71369, 1), Range32), $clone(new Range32.ptr(71472, 71481, 1), Range32), $clone(new Range32.ptr(71904, 71913, 1), Range32), $clone(new Range32.ptr(72016, 72025, 1), Range32), $clone(new Range32.ptr(72784, 72793, 1), Range32), $clone(new Range32.ptr(73040, 73049, 1), Range32), $clone(new Range32.ptr(73120, 73129, 1), Range32), $clone(new Range32.ptr(92768, 92777, 1), Range32), $clone(new Range32.ptr(93008, 93017, 1), Range32), $clone(new Range32.ptr(120782, 120831, 1), Range32), $clone(new Range32.ptr(123200, 123209, 1), Range32), $clone(new Range32.ptr(123632, 123641, 1), Range32), $clone(new Range32.ptr(125264, 125273, 1), Range32), $clone(new Range32.ptr(130032, 130041, 1), Range32)]), 1);
+		$pkg.Digit = _Nd;
+		$pkg.Letter = _L;
 		_White_Space = new RangeTable.ptr(new sliceType([$clone(new Range16.ptr(9, 13, 1), Range16), $clone(new Range16.ptr(32, 133, 101), Range16), $clone(new Range16.ptr(160, 5760, 5600), Range16), $clone(new Range16.ptr(8192, 8202, 1), Range16), $clone(new Range16.ptr(8232, 8233, 1), Range16), $clone(new Range16.ptr(8239, 8287, 48), Range16), $clone(new Range16.ptr(12288, 12288, 1), Range16)]), sliceType$1.nil, 2);
 		$pkg.White_Space = _White_Space;
 		_CaseRanges = new sliceType$3([$clone(new CaseRange.ptr(65, 90, $clone($toNativeArray($kindInt32, [0, 32, 0]), d)), CaseRange), $clone(new CaseRange.ptr(97, 122, $clone($toNativeArray($kindInt32, [-32, 0, -32]), d)), CaseRange), $clone(new CaseRange.ptr(181, 181, $clone($toNativeArray($kindInt32, [743, 0, 743]), d)), CaseRange), $clone(new CaseRange.ptr(192, 214, $clone($toNativeArray($kindInt32, [0, 32, 0]), d)), CaseRange), $clone(new CaseRange.ptr(216, 222, $clone($toNativeArray($kindInt32, [0, 32, 0]), d)), CaseRange), $clone(new CaseRange.ptr(224, 246, $clone($toNativeArray($kindInt32, [-32, 0, -32]), d)), CaseRange), $clone(new CaseRange.ptr(248, 254, $clone($toNativeArray($kindInt32, [-32, 0, -32]), d)), CaseRange), $clone(new CaseRange.ptr(255, 255, $clone($toNativeArray($kindInt32, [121, 0, 121]), d)), CaseRange), $clone(new CaseRange.ptr(256, 303, $clone($toNativeArray($kindInt32, [1114112, 1114112, 1114112]), d)), CaseRange), $clone(new CaseRange.ptr(304, 304, $clone($toNativeArray($kindInt32, [0, -199, 0]), d)), CaseRange), $clone(new CaseRange.ptr(305, 305, $clone($toNativeArray($kindInt32, [-232, 0, -232]), d)), CaseRange), $clone(new CaseRange.ptr(306, 311, $clone($toNativeArray($kindInt32, [1114112, 1114112, 1114112]), d)), CaseRange), $clone(new CaseRange.ptr(313, 328, $clone($toNativeArray($kindInt32, [1114112, 1114112, 1114112]), d)), CaseRange), $clone(new CaseRange.ptr(330, 375, $clone($toNativeArray($kindInt32, [1114112, 1114112, 1114112]), d)), CaseRange), $clone(new CaseRange.ptr(376, 376, $clone($toNativeArray($kindInt32, [0, -121, 0]), d)), CaseRange), $clone(new CaseRange.ptr(377, 382, $clone($toNativeArray($kindInt32, [1114112, 1114112, 1114112]), d)), CaseRange), $clone(new CaseRange.ptr(383, 383, $clone($toNativeArray($kindInt32, [-300, 0, -300]), d)), CaseRange), $clone(new CaseRange.ptr(384, 384, $clone($toNativeArray($kindInt32, [195, 0, 195]), d)), CaseRange), $clone(new CaseRange.ptr(385, 385, $clone($toNativeArray($kindInt32, [0, 210, 0]), d)), CaseRange), $clone(new CaseRange.ptr(386, 389, $clone($toNativeArray($kindInt32, [1114112, 1114112, 1114112]), d)), CaseRange), $clone(new CaseRange.ptr(390, 390, $clone($toNativeArray($kindInt32, [0, 206, 0]), d)), CaseRange), $clone(new CaseRange.ptr(391, 392, $clone($toNativeArray($kindInt32, [1114112, 1114112, 1114112]), d)), CaseRange), $clone(new CaseRange.ptr(393, 394, $clone($toNativeArray($kindInt32, [0, 205, 0]), d)), CaseRange), $clone(new CaseRange.ptr(395, 396, $clone($toNativeArray($kindInt32, [1114112, 1114112, 1114112]), d)), CaseRange), $clone(new CaseRange.ptr(398, 398, $clone($toNativeArray($kindInt32, [0, 79, 0]), d)), CaseRange), $clone(new CaseRange.ptr(399, 399, $clone($toNativeArray($kindInt32, [0, 202, 0]), d)), CaseRange), $clone(new CaseRange.ptr(400, 400, $clone($toNativeArray($kindInt32, [0, 203, 0]), d)), CaseRange), $clone(new CaseRange.ptr(401, 402, $clone($toNativeArray($kindInt32, [1114112, 1114112, 1114112]), d)), CaseRange), $clone(new CaseRange.ptr(403, 403, $clone($toNativeArray($kindInt32, [0, 205, 0]), d)), CaseRange), $clone(new CaseRange.ptr(404, 404, $clone($toNativeArray($kindInt32, [0, 207, 0]), d)), CaseRange), $clone(new CaseRange.ptr(405, 405, $clone($toNativeArray($kindInt32, [97, 0, 97]), d)), CaseRange), $clone(new CaseRange.ptr(406, 406, $clone($toNativeArray($kindInt32, [0, 211, 0]), d)), CaseRange), $clone(new CaseRange.ptr(407, 407, $clone($toNativeArray($kindInt32, [0, 209, 0]), d)), CaseRange), $clone(new CaseRange.ptr(408, 409, $clone($toNativeArray($kindInt32, [1114112, 1114112, 1114112]), d)), CaseRange), $clone(new CaseRange.ptr(410, 410, $clone($toNativeArray($kindInt32, [163, 0, 163]), d)), CaseRange), $clone(new CaseRange.ptr(412, 412, $clone($toNativeArray($kindInt32, [0, 211, 0]), d)), CaseRange), $clone(new CaseRange.ptr(413, 413, $clone($toNativeArray($kindInt32, [0, 213, 0]), d)), CaseRange), $clone(new CaseRange.ptr(414, 414, $clone($toNativeArray($kindInt32, [130, 0, 130]), d)), CaseRange), $clone(new CaseRange.ptr(415, 415, $clone($toNativeArray($kindInt32, [0, 214, 0]), d)), CaseRange), $clone(new CaseRange.ptr(416, 421, $clone($toNativeArray($kindInt32, [1114112, 1114112, 1114112]), d)), CaseRange), $clone(new CaseRange.ptr(422, 422, $clone($toNativeArray($kindInt32, [0, 218, 0]), d)), CaseRange), $clone(new CaseRange.ptr(423, 424, $clone($toNativeArray($kindInt32, [1114112, 1114112, 1114112]), d)), CaseRange), $clone(new CaseRange.ptr(425, 425, $clone($toNativeArray($kindInt32, [0, 218, 0]), d)), CaseRange), $clone(new CaseRange.ptr(428, 429, $clone($toNativeArray($kindInt32, [1114112, 1114112, 1114112]), d)), CaseRange), $clone(new CaseRange.ptr(430, 430, $clone($toNativeArray($kindInt32, [0, 218, 0]), d)), CaseRange), $clone(new CaseRange.ptr(431, 432, $clone($toNativeArray($kindInt32, [1114112, 1114112, 1114112]), d)), CaseRange), $clone(new CaseRange.ptr(433, 434, $clone($toNativeArray($kindInt32, [0, 217, 0]), d)), CaseRange), $clone(new CaseRange.ptr(435, 438, $clone($toNativeArray($kindInt32, [1114112, 1114112, 1114112]), d)), CaseRange), $clone(new CaseRange.ptr(439, 439, $clone($toNativeArray($kindInt32, [0, 219, 0]), d)), CaseRange), $clone(new CaseRange.ptr(440, 441, $clone($toNativeArray($kindInt32, [1114112, 1114112, 1114112]), d)), CaseRange), $clone(new CaseRange.ptr(444, 445, $clone($toNativeArray($kindInt32, [1114112, 1114112, 1114112]), d)), CaseRange), $clone(new CaseRange.ptr(447, 447, $clone($toNativeArray($kindInt32, [56, 0, 56]), d)), CaseRange), $clone(new CaseRange.ptr(452, 452, $clone($toNativeArray($kindInt32, [0, 2, 1]), d)), CaseRange), $clone(new CaseRange.ptr(453, 453, $clone($toNativeArray($kindInt32, [-1, 1, 0]), d)), CaseRange), $clone(new CaseRange.ptr(454, 454, $clone($toNativeArray($kindInt32, [-2, 0, -1]), d)), CaseRange), $clone(new CaseRange.ptr(455, 455, $clone($toNativeArray($kindInt32, [0, 2, 1]), d)), CaseRange), $clone(new CaseRange.ptr(456, 456, $clone($toNativeArray($kindInt32, [-1, 1, 0]), d)), CaseRange), $clone(new CaseRange.ptr(457, 457, $clone($toNativeArray($kindInt32, [-2, 0, -1]), d)), CaseRange), $clone(new CaseRange.ptr(458, 458, $clone($toNativeArray($kindInt32, [0, 2, 1]), d)), CaseRange), $clone(new CaseRange.ptr(459, 459, $clone($toNativeArray($kindInt32, [-1, 1, 0]), d)), CaseRange), $clone(new CaseRange.ptr(460, 460, $clone($toNativeArray($kindInt32, [-2, 0, -1]), d)), CaseRange), $clone(new CaseRange.ptr(461, 476, $clone($toNativeArray($kindInt32, [1114112, 1114112, 1114112]), d)), CaseRange), $clone(new CaseRange.ptr(477, 477, $clone($toNativeArray($kindInt32, [-79, 0, -79]), d)), CaseRange), $clone(new CaseRange.ptr(478, 495, $clone($toNativeArray($kindInt32, [1114112, 1114112, 1114112]), d)), CaseRange), $clone(new CaseRange.ptr(497, 497, $clone($toNativeArray($kindInt32, [0, 2, 1]), d)), CaseRange), $clone(new CaseRange.ptr(498, 498, $clone($toNativeArray($kindInt32, [-1, 1, 0]), d)), CaseRange), $clone(new CaseRange.ptr(499, 499, $clone($toNativeArray($kindInt32, [-2, 0, -1]), d)), CaseRange), $clone(new CaseRange.ptr(500, 501, $clone($toNativeArray($kindInt32, [1114112, 1114112, 1114112]), d)), CaseRange), $clone(new CaseRange.ptr(502, 502, $clone($toNativeArray($kindInt32, [0, -97, 0]), d)), CaseRange), $clone(new CaseRange.ptr(503, 503, $clone($toNativeArray($kindInt32, [0, -56, 0]), d)), CaseRange), $clone(new CaseRange.ptr(504, 543, $clone($toNativeArray($kindInt32, [1114112, 1114112, 1114112]), d)), CaseRange), $clone(new CaseRange.ptr(544, 544, $clone($toNativeArray($kindInt32, [0, -130, 0]), d)), CaseRange), $clone(new CaseRange.ptr(546, 563, $clone($toNativeArray($kindInt32, [1114112, 1114112, 1114112]), d)), CaseRange), $clone(new CaseRange.ptr(570, 570, $clone($toNativeArray($kindInt32, [0, 10795, 0]), d)), CaseRange), $clone(new CaseRange.ptr(571, 572, $clone($toNativeArray($kindInt32, [1114112, 1114112, 1114112]), d)), CaseRange), $clone(new CaseRange.ptr(573, 573, $clone($toNativeArray($kindInt32, [0, -163, 0]), d)), CaseRange), $clone(new CaseRange.ptr(574, 574, $clone($toNativeArray($kindInt32, [0, 10792, 0]), d)), CaseRange), $clone(new CaseRange.ptr(575, 576, $clone($toNativeArray($kindInt32, [10815, 0, 10815]), d)), CaseRange), $clone(new CaseRange.ptr(577, 578, $clone($toNativeArray($kindInt32, [1114112, 1114112, 1114112]), d)), CaseRange), $clone(new CaseRange.ptr(579, 579, $clone($toNativeArray($kindInt32, [0, -195, 0]), d)), CaseRange), $clone(new CaseRange.ptr(580, 580, $clone($toNativeArray($kindInt32, [0, 69, 0]), d)), CaseRange), $clone(new CaseRange.ptr(581, 581, $clone($toNativeArray($kindInt32, [0, 71, 0]), d)), CaseRange), $clone(new CaseRange.ptr(582, 591, $clone($toNativeArray($kindInt32, [1114112, 1114112, 1114112]), d)), CaseRange), $clone(new CaseRange.ptr(592, 592, $clone($toNativeArray($kindInt32, [10783, 0, 10783]), d)), CaseRange), $clone(new CaseRange.ptr(593, 593, $clone($toNativeArray($kindInt32, [10780, 0, 10780]), d)), CaseRange), $clone(new CaseRange.ptr(594, 594, $clone($toNativeArray($kindInt32, [10782, 0, 10782]), d)), CaseRange), $clone(new CaseRange.ptr(595, 595, $clone($toNativeArray($kindInt32, [-210, 0, -210]), d)), CaseRange), $clone(new CaseRange.ptr(596, 596, $clone($toNativeArray($kindInt32, [-206, 0, -206]), d)), CaseRange), $clone(new CaseRange.ptr(598, 599, $clone($toNativeArray($kindInt32, [-205, 0, -205]), d)), CaseRange), $clone(new CaseRange.ptr(601, 601, $clone($toNativeArray($kindInt32, [-202, 0, -202]), d)), CaseRange), $clone(new CaseRange.ptr(603, 603, $clone($toNativeArray($kindInt32, [-203, 0, -203]), d)), CaseRange), $clone(new CaseRange.ptr(604, 604, $clone($toNativeArray($kindInt32, [42319, 0, 42319]), d)), CaseRange), $clone(new CaseRange.ptr(608, 608, $clone($toNativeArray($kindInt32, [-205, 0, -205]), d)), CaseRange), $clone(new CaseRange.ptr(609, 609, $clone($toNativeArray($kindInt32, [42315, 0, 42315]), d)), CaseRange), $clone(new CaseRange.ptr(611, 611, $clone($toNativeArray($kindInt32, [-207, 0, -207]), d)), CaseRange), $clone(new CaseRange.ptr(613, 613, $clone($toNativeArray($kindInt32, [42280, 0, 42280]), d)), CaseRange), $clone(new CaseRange.ptr(614, 614, $clone($toNativeArray($kindInt32, [42308, 0, 42308]), d)), CaseRange), $clone(new CaseRange.ptr(616, 616, $clone($toNativeArray($kindInt32, [-209, 0, -209]), d)), CaseRange), $clone(new CaseRange.ptr(617, 617, $clone($toNativeArray($kindInt32, [-211, 0, -211]), d)), CaseRange), $clone(new CaseRange.ptr(618, 618, $clone($toNativeArray($kindInt32, [42308, 0, 42308]), d)), CaseRange), $clone(new CaseRange.ptr(619, 619, $clone($toNativeArray($kindInt32, [10743, 0, 10743]), d)), CaseRange), $clone(new CaseRange.ptr(620, 620, $clone($toNativeArray($kindInt32, [42305, 0, 42305]), d)), CaseRange), $clone(new CaseRange.ptr(623, 623, $clone($toNativeArray($kindInt32, [-211, 0, -211]), d)), CaseRange), $clone(new CaseRange.ptr(625, 625, $clone($toNativeArray($kindInt32, [10749, 0, 10749]), d)), CaseRange), $clone(new CaseRange.ptr(626, 626, $clone($toNativeArray($kindInt32, [-213, 0, -213]), d)), CaseRange), $clone(new CaseRange.ptr(629, 629, $clone($toNativeArray($kindInt32, [-214, 0, -214]), d)), CaseRange), $clone(new CaseRange.ptr(637, 637, $clone($toNativeArray($kindInt32, [10727, 0, 10727]), d)), CaseRange), $clone(new CaseRange.ptr(640, 640, $clone($toNativeArray($kindInt32, [-218, 0, -218]), d)), CaseRange), $clone(new CaseRange.ptr(642, 642, $clone($toNativeArray($kindInt32, [42307, 0, 42307]), d)), CaseRange), $clone(new CaseRange.ptr(643, 643, $clone($toNativeArray($kindInt32, [-218, 0, -218]), d)), CaseRange), $clone(new CaseRange.ptr(647, 647, $clone($toNativeArray($kindInt32, [42282, 0, 42282]), d)), CaseRange), $clone(new CaseRange.ptr(648, 648, $clone($toNativeArray($kindInt32, [-218, 0, -218]), d)), CaseRange), $clone(new CaseRange.ptr(649, 649, $clone($toNativeArray($kindInt32, [-69, 0, -69]), d)), CaseRange), $clone(new CaseRange.ptr(650, 651, $clone($toNativeArray($kindInt32, [-217, 0, -217]), d)), CaseRange), $clone(new CaseRange.ptr(652, 652, $clone($toNativeArray($kindInt32, [-71, 0, -71]), d)), CaseRange), $clone(new CaseRange.ptr(658, 658, $clone($toNativeArray($kindInt32, [-219, 0, -219]), d)), CaseRange), $clone(new CaseRange.ptr(669, 669, $clone($toNativeArray($kindInt32, [42261, 0, 42261]), d)), CaseRange), $clone(new CaseRange.ptr(670, 670, $clone($toNativeArray($kindInt32, [42258, 0, 42258]), d)), CaseRange), $clone(new CaseRange.ptr(837, 837, $clone($toNativeArray($kindInt32, [84, 0, 84]), d)), CaseRange), $clone(new CaseRange.ptr(880, 883, $clone($toNativeArray($kindInt32, [1114112, 1114112, 1114112]), d)), CaseRange), $clone(new CaseRange.ptr(886, 887, $clone($toNativeArray($kindInt32, [1114112, 1114112, 1114112]), d)), CaseRange), $clone(new CaseRange.ptr(891, 893, $clone($toNativeArray($kindInt32, [130, 0, 130]), d)), CaseRange), $clone(new CaseRange.ptr(895, 895, $clone($toNativeArray($kindInt32, [0, 116, 0]), d)), CaseRange), $clone(new CaseRange.ptr(902, 902, $clone($toNativeArray($kindInt32, [0, 38, 0]), d)), CaseRange), $clone(new CaseRange.ptr(904, 906, $clone($toNativeArray($kindInt32, [0, 37, 0]), d)), CaseRange), $clone(new CaseRange.ptr(908, 908, $clone($toNativeArray($kindInt32, [0, 64, 0]), d)), CaseRange), $clone(new CaseRange.ptr(910, 911, $clone($toNativeArray($kindInt32, [0, 63, 0]), d)), CaseRange), $clone(new CaseRange.ptr(913, 929, $clone($toNativeArray($kindInt32, [0, 32, 0]), d)), CaseRange), $clone(new CaseRange.ptr(931, 939, $clone($toNativeArray($kindInt32, [0, 32, 0]), d)), CaseRange), $clone(new CaseRange.ptr(940, 940, $clone($toNativeArray($kindInt32, [-38, 0, -38]), d)), CaseRange), $clone(new CaseRange.ptr(941, 943, $clone($toNativeArray($kindInt32, [-37, 0, -37]), d)), CaseRange), $clone(new CaseRange.ptr(945, 961, $clone($toNativeArray($kindInt32, [-32, 0, -32]), d)), CaseRange), $clone(new CaseRange.ptr(962, 962, $clone($toNativeArray($kindInt32, [-31, 0, -31]), d)), CaseRange), $clone(new CaseRange.ptr(963, 971, $clone($toNativeArray($kindInt32, [-32, 0, -32]), d)), CaseRange), $clone(new CaseRange.ptr(972, 972, $clone($toNativeArray($kindInt32, [-64, 0, -64]), d)), CaseRange), $clone(new CaseRange.ptr(973, 974, $clone($toNativeArray($kindInt32, [-63, 0, -63]), d)), CaseRange), $clone(new CaseRange.ptr(975, 975, $clone($toNativeArray($kindInt32, [0, 8, 0]), d)), CaseRange), $clone(new CaseRange.ptr(976, 976, $clone($toNativeArray($kindInt32, [-62, 0, -62]), d)), CaseRange), $clone(new CaseRange.ptr(977, 977, $clone($toNativeArray($kindInt32, [-57, 0, -57]), d)), CaseRange), $clone(new CaseRange.ptr(981, 981, $clone($toNativeArray($kindInt32, [-47, 0, -47]), d)), CaseRange), $clone(new CaseRange.ptr(982, 982, $clone($toNativeArray($kindInt32, [-54, 0, -54]), d)), CaseRange), $clone(new CaseRange.ptr(983, 983, $clone($toNativeArray($kindInt32, [-8, 0, -8]), d)), CaseRange), $clone(new CaseRange.ptr(984, 1007, $clone($toNativeArray($kindInt32, [1114112, 1114112, 1114112]), d)), CaseRange), $clone(new CaseRange.ptr(1008, 1008, $clone($toNativeArray($kindInt32, [-86, 0, -86]), d)), CaseRange), $clone(new CaseRange.ptr(1009, 1009, $clone($toNativeArray($kindInt32, [-80, 0, -80]), d)), CaseRange), $clone(new CaseRange.ptr(1010, 1010, $clone($toNativeArray($kindInt32, [7, 0, 7]), d)), CaseRange), $clone(new CaseRange.ptr(1011, 1011, $clone($toNativeArray($kindInt32, [-116, 0, -116]), d)), CaseRange), $clone(new CaseRange.ptr(1012, 1012, $clone($toNativeArray($kindInt32, [0, -60, 0]), d)), CaseRange), $clone(new CaseRange.ptr(1013, 1013, $clone($toNativeArray($kindInt32, [-96, 0, -96]), d)), CaseRange), $clone(new CaseRange.ptr(1015, 1016, $clone($toNativeArray($kindInt32, [1114112, 1114112, 1114112]), d)), CaseRange), $clone(new CaseRange.ptr(1017, 1017, $clone($toNativeArray($kindInt32, [0, -7, 0]), d)), CaseRange), $clone(new CaseRange.ptr(1018, 1019, $clone($toNativeArray($kindInt32, [1114112, 1114112, 1114112]), d)), CaseRange), $clone(new CaseRange.ptr(1021, 1023, $clone($toNativeArray($kindInt32, [0, -130, 0]), d)), CaseRange), $clone(new CaseRange.ptr(1024, 1039, $clone($toNativeArray($kindInt32, [0, 80, 0]), d)), CaseRange), $clone(new CaseRange.ptr(1040, 1071, $clone($toNativeArray($kindInt32, [0, 32, 0]), d)), CaseRange), $clone(new CaseRange.ptr(1072, 1103, $clone($toNativeArray($kindInt32, [-32, 0, -32]), d)), CaseRange), $clone(new CaseRange.ptr(1104, 1119, $clone($toNativeArray($kindInt32, [-80, 0, -80]), d)), CaseRange), $clone(new CaseRange.ptr(1120, 1153, $clone($toNativeArray($kindInt32, [1114112, 1114112, 1114112]), d)), CaseRange), $clone(new CaseRange.ptr(1162, 1215, $clone($toNativeArray($kindInt32, [1114112, 1114112, 1114112]), d)), CaseRange), $clone(new CaseRange.ptr(1216, 1216, $clone($toNativeArray($kindInt32, [0, 15, 0]), d)), CaseRange), $clone(new CaseRange.ptr(1217, 1230, $clone($toNativeArray($kindInt32, [1114112, 1114112, 1114112]), d)), CaseRange), $clone(new CaseRange.ptr(1231, 1231, $clone($toNativeArray($kindInt32, [-15, 0, -15]), d)), CaseRange), $clone(new CaseRange.ptr(1232, 1327, $clone($toNativeArray($kindInt32, [1114112, 1114112, 1114112]), d)), CaseRange), $clone(new CaseRange.ptr(1329, 1366, $clone($toNativeArray($kindInt32, [0, 48, 0]), d)), CaseRange), $clone(new CaseRange.ptr(1377, 1414, $clone($toNativeArray($kindInt32, [-48, 0, -48]), d)), CaseRange), $clone(new CaseRange.ptr(4256, 4293, $clone($toNativeArray($kindInt32, [0, 7264, 0]), d)), CaseRange), $clone(new CaseRange.ptr(4295, 4295, $clone($toNativeArray($kindInt32, [0, 7264, 0]), d)), CaseRange), $clone(new CaseRange.ptr(4301, 4301, $clone($toNativeArray($kindInt32, [0, 7264, 0]), d)), CaseRange), $clone(new CaseRange.ptr(4304, 4346, $clone($toNativeArray($kindInt32, [3008, 0, 0]), d)), CaseRange), $clone(new CaseRange.ptr(4349, 4351, $clone($toNativeArray($kindInt32, [3008, 0, 0]), d)), CaseRange), $clone(new CaseRange.ptr(5024, 5103, $clone($toNativeArray($kindInt32, [0, 38864, 0]), d)), CaseRange), $clone(new CaseRange.ptr(5104, 5109, $clone($toNativeArray($kindInt32, [0, 8, 0]), d)), CaseRange), $clone(new CaseRange.ptr(5112, 5117, $clone($toNativeArray($kindInt32, [-8, 0, -8]), d)), CaseRange), $clone(new CaseRange.ptr(7296, 7296, $clone($toNativeArray($kindInt32, [-6254, 0, -6254]), d)), CaseRange), $clone(new CaseRange.ptr(7297, 7297, $clone($toNativeArray($kindInt32, [-6253, 0, -6253]), d)), CaseRange), $clone(new CaseRange.ptr(7298, 7298, $clone($toNativeArray($kindInt32, [-6244, 0, -6244]), d)), CaseRange), $clone(new CaseRange.ptr(7299, 7300, $clone($toNativeArray($kindInt32, [-6242, 0, -6242]), d)), CaseRange), $clone(new CaseRange.ptr(7301, 7301, $clone($toNativeArray($kindInt32, [-6243, 0, -6243]), d)), CaseRange), $clone(new CaseRange.ptr(7302, 7302, $clone($toNativeArray($kindInt32, [-6236, 0, -6236]), d)), CaseRange), $clone(new CaseRange.ptr(7303, 7303, $clone($toNativeArray($kindInt32, [-6181, 0, -6181]), d)), CaseRange), $clone(new CaseRange.ptr(7304, 7304, $clone($toNativeArray($kindInt32, [35266, 0, 35266]), d)), CaseRange), $clone(new CaseRange.ptr(7312, 7354, $clone($toNativeArray($kindInt32, [0, -3008, 0]), d)), CaseRange), $clone(new CaseRange.ptr(7357, 7359, $clone($toNativeArray($kindInt32, [0, -3008, 0]), d)), CaseRange), $clone(new CaseRange.ptr(7545, 7545, $clone($toNativeArray($kindInt32, [35332, 0, 35332]), d)), CaseRange), $clone(new CaseRange.ptr(7549, 7549, $clone($toNativeArray($kindInt32, [3814, 0, 3814]), d)), CaseRange), $clone(new CaseRange.ptr(7566, 7566, $clone($toNativeArray($kindInt32, [35384, 0, 35384]), d)), CaseRange), $clone(new CaseRange.ptr(7680, 7829, $clone($toNativeArray($kindInt32, [1114112, 1114112, 1114112]), d)), CaseRange), $clone(new CaseRange.ptr(7835, 7835, $clone($toNativeArray($kindInt32, [-59, 0, -59]), d)), CaseRange), $clone(new CaseRange.ptr(7838, 7838, $clone($toNativeArray($kindInt32, [0, -7615, 0]), d)), CaseRange), $clone(new CaseRange.ptr(7840, 7935, $clone($toNativeArray($kindInt32, [1114112, 1114112, 1114112]), d)), CaseRange), $clone(new CaseRange.ptr(7936, 7943, $clone($toNativeArray($kindInt32, [8, 0, 8]), d)), CaseRange), $clone(new CaseRange.ptr(7944, 7951, $clone($toNativeArray($kindInt32, [0, -8, 0]), d)), CaseRange), $clone(new CaseRange.ptr(7952, 7957, $clone($toNativeArray($kindInt32, [8, 0, 8]), d)), CaseRange), $clone(new CaseRange.ptr(7960, 7965, $clone($toNativeArray($kindInt32, [0, -8, 0]), d)), CaseRange), $clone(new CaseRange.ptr(7968, 7975, $clone($toNativeArray($kindInt32, [8, 0, 8]), d)), CaseRange), $clone(new CaseRange.ptr(7976, 7983, $clone($toNativeArray($kindInt32, [0, -8, 0]), d)), CaseRange), $clone(new CaseRange.ptr(7984, 7991, $clone($toNativeArray($kindInt32, [8, 0, 8]), d)), CaseRange), $clone(new CaseRange.ptr(7992, 7999, $clone($toNativeArray($kindInt32, [0, -8, 0]), d)), CaseRange), $clone(new CaseRange.ptr(8000, 8005, $clone($toNativeArray($kindInt32, [8, 0, 8]), d)), CaseRange), $clone(new CaseRange.ptr(8008, 8013, $clone($toNativeArray($kindInt32, [0, -8, 0]), d)), CaseRange), $clone(new CaseRange.ptr(8017, 8017, $clone($toNativeArray($kindInt32, [8, 0, 8]), d)), CaseRange), $clone(new CaseRange.ptr(8019, 8019, $clone($toNativeArray($kindInt32, [8, 0, 8]), d)), CaseRange), $clone(new CaseRange.ptr(8021, 8021, $clone($toNativeArray($kindInt32, [8, 0, 8]), d)), CaseRange), $clone(new CaseRange.ptr(8023, 8023, $clone($toNativeArray($kindInt32, [8, 0, 8]), d)), CaseRange), $clone(new CaseRange.ptr(8025, 8025, $clone($toNativeArray($kindInt32, [0, -8, 0]), d)), CaseRange), $clone(new CaseRange.ptr(8027, 8027, $clone($toNativeArray($kindInt32, [0, -8, 0]), d)), CaseRange), $clone(new CaseRange.ptr(8029, 8029, $clone($toNativeArray($kindInt32, [0, -8, 0]), d)), CaseRange), $clone(new CaseRange.ptr(8031, 8031, $clone($toNativeArray($kindInt32, [0, -8, 0]), d)), CaseRange), $clone(new CaseRange.ptr(8032, 8039, $clone($toNativeArray($kindInt32, [8, 0, 8]), d)), CaseRange), $clone(new CaseRange.ptr(8040, 8047, $clone($toNativeArray($kindInt32, [0, -8, 0]), d)), CaseRange), $clone(new CaseRange.ptr(8048, 8049, $clone($toNativeArray($kindInt32, [74, 0, 74]), d)), CaseRange), $clone(new CaseRange.ptr(8050, 8053, $clone($toNativeArray($kindInt32, [86, 0, 86]), d)), CaseRange), $clone(new CaseRange.ptr(8054, 8055, $clone($toNativeArray($kindInt32, [100, 0, 100]), d)), CaseRange), $clone(new CaseRange.ptr(8056, 8057, $clone($toNativeArray($kindInt32, [128, 0, 128]), d)), CaseRange), $clone(new CaseRange.ptr(8058, 8059, $clone($toNativeArray($kindInt32, [112, 0, 112]), d)), CaseRange), $clone(new CaseRange.ptr(8060, 8061, $clone($toNativeArray($kindInt32, [126, 0, 126]), d)), CaseRange), $clone(new CaseRange.ptr(8064, 8071, $clone($toNativeArray($kindInt32, [8, 0, 8]), d)), CaseRange), $clone(new CaseRange.ptr(8072, 8079, $clone($toNativeArray($kindInt32, [0, -8, 0]), d)), CaseRange), $clone(new CaseRange.ptr(8080, 8087, $clone($toNativeArray($kindInt32, [8, 0, 8]), d)), CaseRange), $clone(new CaseRange.ptr(8088, 8095, $clone($toNativeArray($kindInt32, [0, -8, 0]), d)), CaseRange), $clone(new CaseRange.ptr(8096, 8103, $clone($toNativeArray($kindInt32, [8, 0, 8]), d)), CaseRange), $clone(new CaseRange.ptr(8104, 8111, $clone($toNativeArray($kindInt32, [0, -8, 0]), d)), CaseRange), $clone(new CaseRange.ptr(8112, 8113, $clone($toNativeArray($kindInt32, [8, 0, 8]), d)), CaseRange), $clone(new CaseRange.ptr(8115, 8115, $clone($toNativeArray($kindInt32, [9, 0, 9]), d)), CaseRange), $clone(new CaseRange.ptr(8120, 8121, $clone($toNativeArray($kindInt32, [0, -8, 0]), d)), CaseRange), $clone(new CaseRange.ptr(8122, 8123, $clone($toNativeArray($kindInt32, [0, -74, 0]), d)), CaseRange), $clone(new CaseRange.ptr(8124, 8124, $clone($toNativeArray($kindInt32, [0, -9, 0]), d)), CaseRange), $clone(new CaseRange.ptr(8126, 8126, $clone($toNativeArray($kindInt32, [-7205, 0, -7205]), d)), CaseRange), $clone(new CaseRange.ptr(8131, 8131, $clone($toNativeArray($kindInt32, [9, 0, 9]), d)), CaseRange), $clone(new CaseRange.ptr(8136, 8139, $clone($toNativeArray($kindInt32, [0, -86, 0]), d)), CaseRange), $clone(new CaseRange.ptr(8140, 8140, $clone($toNativeArray($kindInt32, [0, -9, 0]), d)), CaseRange), $clone(new CaseRange.ptr(8144, 8145, $clone($toNativeArray($kindInt32, [8, 0, 8]), d)), CaseRange), $clone(new CaseRange.ptr(8152, 8153, $clone($toNativeArray($kindInt32, [0, -8, 0]), d)), CaseRange), $clone(new CaseRange.ptr(8154, 8155, $clone($toNativeArray($kindInt32, [0, -100, 0]), d)), CaseRange), $clone(new CaseRange.ptr(8160, 8161, $clone($toNativeArray($kindInt32, [8, 0, 8]), d)), CaseRange), $clone(new CaseRange.ptr(8165, 8165, $clone($toNativeArray($kindInt32, [7, 0, 7]), d)), CaseRange), $clone(new CaseRange.ptr(8168, 8169, $clone($toNativeArray($kindInt32, [0, -8, 0]), d)), CaseRange), $clone(new CaseRange.ptr(8170, 8171, $clone($toNativeArray($kindInt32, [0, -112, 0]), d)), CaseRange), $clone(new CaseRange.ptr(8172, 8172, $clone($toNativeArray($kindInt32, [0, -7, 0]), d)), CaseRange), $clone(new CaseRange.ptr(8179, 8179, $clone($toNativeArray($kindInt32, [9, 0, 9]), d)), CaseRange), $clone(new CaseRange.ptr(8184, 8185, $clone($toNativeArray($kindInt32, [0, -128, 0]), d)), CaseRange), $clone(new CaseRange.ptr(8186, 8187, $clone($toNativeArray($kindInt32, [0, -126, 0]), d)), CaseRange), $clone(new CaseRange.ptr(8188, 8188, $clone($toNativeArray($kindInt32, [0, -9, 0]), d)), CaseRange), $clone(new CaseRange.ptr(8486, 8486, $clone($toNativeArray($kindInt32, [0, -7517, 0]), d)), CaseRange), $clone(new CaseRange.ptr(8490, 8490, $clone($toNativeArray($kindInt32, [0, -8383, 0]), d)), CaseRange), $clone(new CaseRange.ptr(8491, 8491, $clone($toNativeArray($kindInt32, [0, -8262, 0]), d)), CaseRange), $clone(new CaseRange.ptr(8498, 8498, $clone($toNativeArray($kindInt32, [0, 28, 0]), d)), CaseRange), $clone(new CaseRange.ptr(8526, 8526, $clone($toNativeArray($kindInt32, [-28, 0, -28]), d)), CaseRange), $clone(new CaseRange.ptr(8544, 8559, $clone($toNativeArray($kindInt32, [0, 16, 0]), d)), CaseRange), $clone(new CaseRange.ptr(8560, 8575, $clone($toNativeArray($kindInt32, [-16, 0, -16]), d)), CaseRange), $clone(new CaseRange.ptr(8579, 8580, $clone($toNativeArray($kindInt32, [1114112, 1114112, 1114112]), d)), CaseRange), $clone(new CaseRange.ptr(9398, 9423, $clone($toNativeArray($kindInt32, [0, 26, 0]), d)), CaseRange), $clone(new CaseRange.ptr(9424, 9449, $clone($toNativeArray($kindInt32, [-26, 0, -26]), d)), CaseRange), $clone(new CaseRange.ptr(11264, 11310, $clone($toNativeArray($kindInt32, [0, 48, 0]), d)), CaseRange), $clone(new CaseRange.ptr(11312, 11358, $clone($toNativeArray($kindInt32, [-48, 0, -48]), d)), CaseRange), $clone(new CaseRange.ptr(11360, 11361, $clone($toNativeArray($kindInt32, [1114112, 1114112, 1114112]), d)), CaseRange), $clone(new CaseRange.ptr(11362, 11362, $clone($toNativeArray($kindInt32, [0, -10743, 0]), d)), CaseRange), $clone(new CaseRange.ptr(11363, 11363, $clone($toNativeArray($kindInt32, [0, -3814, 0]), d)), CaseRange), $clone(new CaseRange.ptr(11364, 11364, $clone($toNativeArray($kindInt32, [0, -10727, 0]), d)), CaseRange), $clone(new CaseRange.ptr(11365, 11365, $clone($toNativeArray($kindInt32, [-10795, 0, -10795]), d)), CaseRange), $clone(new CaseRange.ptr(11366, 11366, $clone($toNativeArray($kindInt32, [-10792, 0, -10792]), d)), CaseRange), $clone(new CaseRange.ptr(11367, 11372, $clone($toNativeArray($kindInt32, [1114112, 1114112, 1114112]), d)), CaseRange), $clone(new CaseRange.ptr(11373, 11373, $clone($toNativeArray($kindInt32, [0, -10780, 0]), d)), CaseRange), $clone(new CaseRange.ptr(11374, 11374, $clone($toNativeArray($kindInt32, [0, -10749, 0]), d)), CaseRange), $clone(new CaseRange.ptr(11375, 11375, $clone($toNativeArray($kindInt32, [0, -10783, 0]), d)), CaseRange), $clone(new CaseRange.ptr(11376, 11376, $clone($toNativeArray($kindInt32, [0, -10782, 0]), d)), CaseRange), $clone(new CaseRange.ptr(11378, 11379, $clone($toNativeArray($kindInt32, [1114112, 1114112, 1114112]), d)), CaseRange), $clone(new CaseRange.ptr(11381, 11382, $clone($toNativeArray($kindInt32, [1114112, 1114112, 1114112]), d)), CaseRange), $clone(new CaseRange.ptr(11390, 11391, $clone($toNativeArray($kindInt32, [0, -10815, 0]), d)), CaseRange), $clone(new CaseRange.ptr(11392, 11491, $clone($toNativeArray($kindInt32, [1114112, 1114112, 1114112]), d)), CaseRange), $clone(new CaseRange.ptr(11499, 11502, $clone($toNativeArray($kindInt32, [1114112, 1114112, 1114112]), d)), CaseRange), $clone(new CaseRange.ptr(11506, 11507, $clone($toNativeArray($kindInt32, [1114112, 1114112, 1114112]), d)), CaseRange), $clone(new CaseRange.ptr(11520, 11557, $clone($toNativeArray($kindInt32, [-7264, 0, -7264]), d)), CaseRange), $clone(new CaseRange.ptr(11559, 11559, $clone($toNativeArray($kindInt32, [-7264, 0, -7264]), d)), CaseRange), $clone(new CaseRange.ptr(11565, 11565, $clone($toNativeArray($kindInt32, [-7264, 0, -7264]), d)), CaseRange), $clone(new CaseRange.ptr(42560, 42605, $clone($toNativeArray($kindInt32, [1114112, 1114112, 1114112]), d)), CaseRange), $clone(new CaseRange.ptr(42624, 42651, $clone($toNativeArray($kindInt32, [1114112, 1114112, 1114112]), d)), CaseRange), $clone(new CaseRange.ptr(42786, 42799, $clone($toNativeArray($kindInt32, [1114112, 1114112, 1114112]), d)), CaseRange), $clone(new CaseRange.ptr(42802, 42863, $clone($toNativeArray($kindInt32, [1114112, 1114112, 1114112]), d)), CaseRange), $clone(new CaseRange.ptr(42873, 42876, $clone($toNativeArray($kindInt32, [1114112, 1114112, 1114112]), d)), CaseRange), $clone(new CaseRange.ptr(42877, 42877, $clone($toNativeArray($kindInt32, [0, -35332, 0]), d)), CaseRange), $clone(new CaseRange.ptr(42878, 42887, $clone($toNativeArray($kindInt32, [1114112, 1114112, 1114112]), d)), CaseRange), $clone(new CaseRange.ptr(42891, 42892, $clone($toNativeArray($kindInt32, [1114112, 1114112, 1114112]), d)), CaseRange), $clone(new CaseRange.ptr(42893, 42893, $clone($toNativeArray($kindInt32, [0, -42280, 0]), d)), CaseRange), $clone(new CaseRange.ptr(42896, 42899, $clone($toNativeArray($kindInt32, [1114112, 1114112, 1114112]), d)), CaseRange), $clone(new CaseRange.ptr(42900, 42900, $clone($toNativeArray($kindInt32, [48, 0, 48]), d)), CaseRange), $clone(new CaseRange.ptr(42902, 42921, $clone($toNativeArray($kindInt32, [1114112, 1114112, 1114112]), d)), CaseRange), $clone(new CaseRange.ptr(42922, 42922, $clone($toNativeArray($kindInt32, [0, -42308, 0]), d)), CaseRange), $clone(new CaseRange.ptr(42923, 42923, $clone($toNativeArray($kindInt32, [0, -42319, 0]), d)), CaseRange), $clone(new CaseRange.ptr(42924, 42924, $clone($toNativeArray($kindInt32, [0, -42315, 0]), d)), CaseRange), $clone(new CaseRange.ptr(42925, 42925, $clone($toNativeArray($kindInt32, [0, -42305, 0]), d)), CaseRange), $clone(new CaseRange.ptr(42926, 42926, $clone($toNativeArray($kindInt32, [0, -42308, 0]), d)), CaseRange), $clone(new CaseRange.ptr(42928, 42928, $clone($toNativeArray($kindInt32, [0, -42258, 0]), d)), CaseRange), $clone(new CaseRange.ptr(42929, 42929, $clone($toNativeArray($kindInt32, [0, -42282, 0]), d)), CaseRange), $clone(new CaseRange.ptr(42930, 42930, $clone($toNativeArray($kindInt32, [0, -42261, 0]), d)), CaseRange), $clone(new CaseRange.ptr(42931, 42931, $clone($toNativeArray($kindInt32, [0, 928, 0]), d)), CaseRange), $clone(new CaseRange.ptr(42932, 42943, $clone($toNativeArray($kindInt32, [1114112, 1114112, 1114112]), d)), CaseRange), $clone(new CaseRange.ptr(42946, 42947, $clone($toNativeArray($kindInt32, [1114112, 1114112, 1114112]), d)), CaseRange), $clone(new CaseRange.ptr(42948, 42948, $clone($toNativeArray($kindInt32, [0, -48, 0]), d)), CaseRange), $clone(new CaseRange.ptr(42949, 42949, $clone($toNativeArray($kindInt32, [0, -42307, 0]), d)), CaseRange), $clone(new CaseRange.ptr(42950, 42950, $clone($toNativeArray($kindInt32, [0, -35384, 0]), d)), CaseRange), $clone(new CaseRange.ptr(42951, 42954, $clone($toNativeArray($kindInt32, [1114112, 1114112, 1114112]), d)), CaseRange), $clone(new CaseRange.ptr(42997, 42998, $clone($toNativeArray($kindInt32, [1114112, 1114112, 1114112]), d)), CaseRange), $clone(new CaseRange.ptr(43859, 43859, $clone($toNativeArray($kindInt32, [-928, 0, -928]), d)), CaseRange), $clone(new CaseRange.ptr(43888, 43967, $clone($toNativeArray($kindInt32, [-38864, 0, -38864]), d)), CaseRange), $clone(new CaseRange.ptr(65313, 65338, $clone($toNativeArray($kindInt32, [0, 32, 0]), d)), CaseRange), $clone(new CaseRange.ptr(65345, 65370, $clone($toNativeArray($kindInt32, [-32, 0, -32]), d)), CaseRange), $clone(new CaseRange.ptr(66560, 66599, $clone($toNativeArray($kindInt32, [0, 40, 0]), d)), CaseRange), $clone(new CaseRange.ptr(66600, 66639, $clone($toNativeArray($kindInt32, [-40, 0, -40]), d)), CaseRange), $clone(new CaseRange.ptr(66736, 66771, $clone($toNativeArray($kindInt32, [0, 40, 0]), d)), CaseRange), $clone(new CaseRange.ptr(66776, 66811, $clone($toNativeArray($kindInt32, [-40, 0, -40]), d)), CaseRange), $clone(new CaseRange.ptr(68736, 68786, $clone($toNativeArray($kindInt32, [0, 64, 0]), d)), CaseRange), $clone(new CaseRange.ptr(68800, 68850, $clone($toNativeArray($kindInt32, [-64, 0, -64]), d)), CaseRange), $clone(new CaseRange.ptr(71840, 71871, $clone($toNativeArray($kindInt32, [0, 32, 0]), d)), CaseRange), $clone(new CaseRange.ptr(71872, 71903, $clone($toNativeArray($kindInt32, [-32, 0, -32]), d)), CaseRange), $clone(new CaseRange.ptr(93760, 93791, $clone($toNativeArray($kindInt32, [0, 32, 0]), d)), CaseRange), $clone(new CaseRange.ptr(93792, 93823, $clone($toNativeArray($kindInt32, [-32, 0, -32]), d)), CaseRange), $clone(new CaseRange.ptr(125184, 125217, $clone($toNativeArray($kindInt32, [0, 34, 0]), d)), CaseRange), $clone(new CaseRange.ptr(125218, 125251, $clone($toNativeArray($kindInt32, [-34, 0, -34]), d)), CaseRange)]);
 		$pkg.CaseRanges = _CaseRanges;
+		properties = $toNativeArray($kindUint8, [1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 144, 130, 130, 130, 136, 130, 130, 130, 130, 130, 130, 136, 130, 130, 130, 130, 132, 132, 132, 132, 132, 132, 132, 132, 132, 132, 130, 130, 136, 136, 136, 130, 130, 160, 160, 160, 160, 160, 160, 160, 160, 160, 160, 160, 160, 160, 160, 160, 160, 160, 160, 160, 160, 160, 160, 160, 160, 160, 160, 130, 130, 130, 136, 130, 136, 192, 192, 192, 192, 192, 192, 192, 192, 192, 192, 192, 192, 192, 192, 192, 192, 192, 192, 192, 192, 192, 192, 192, 192, 192, 192, 130, 136, 130, 136, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 16, 130, 136, 136, 136, 136, 136, 130, 136, 136, 224, 130, 136, 0, 136, 136, 136, 136, 132, 132, 136, 192, 130, 130, 136, 132, 224, 130, 132, 132, 132, 130, 160, 160, 160, 160, 160, 160, 160, 160, 160, 160, 160, 160, 160, 160, 160, 160, 160, 160, 160, 160, 160, 160, 160, 136, 160, 160, 160, 160, 160, 160, 160, 192, 192, 192, 192, 192, 192, 192, 192, 192, 192, 192, 192, 192, 192, 192, 192, 192, 192, 192, 192, 192, 192, 192, 192, 136, 192, 192, 192, 192, 192, 192, 192, 192]);
 		/* */ } return; } if ($f === undefined) { $f = { $blk: $init }; } $f.$s = $s; $f.$r = $r; return $f;
 	};
 	$pkg.$init = $init;
 	return $pkg;
 })();
 $packages["unicode/utf8"] = (function() {
-	var $pkg = {}, $init, acceptRange, first, acceptRanges, DecodeRuneInString, DecodeLastRuneInString, RuneLen, EncodeRune, RuneStart;
+	var $pkg = {}, $init, acceptRange, first, acceptRanges, DecodeRuneInString, DecodeLastRuneInString, RuneLen, EncodeRune, RuneCountInString, RuneStart;
 	acceptRange = $pkg.acceptRange = $newType(0, $kindStruct, "utf8.acceptRange", true, "unicode/utf8", false, function(lo_, hi_) {
 		this.$val = this;
 		if (arguments.length === 0) {
@@ -6206,6 +6259,55 @@ $packages["unicode/utf8"] = (function() {
 		}
 	};
 	$pkg.EncodeRune = EncodeRune;
+	RuneCountInString = function(s) {
+		var accept, c, c$1, c$2, c$3, i, n, ns, s, size, x, x$1;
+		n = 0;
+		ns = s.length;
+		i = 0;
+		while (true) {
+			if (!(i < ns)) { break; }
+			c = s.charCodeAt(i);
+			if (c < 128) {
+				i = i + (1) >> 0;
+				n = n + (1) >> 0;
+				continue;
+			}
+			x = ((c < 0 || c >= first.length) ? ($throwRuntimeError("index out of range"), undefined) : first[c]);
+			if (x === 241) {
+				i = i + (1) >> 0;
+				n = n + (1) >> 0;
+				continue;
+			}
+			size = ((((x & 7) >>> 0) >> 0));
+			if ((i + size >> 0) > ns) {
+				i = i + (1) >> 0;
+				n = n + (1) >> 0;
+				continue;
+			}
+			accept = $clone((x$1 = x >>> 4 << 24 >>> 24, ((x$1 < 0 || x$1 >= acceptRanges.length) ? ($throwRuntimeError("index out of range"), undefined) : acceptRanges[x$1])), acceptRange);
+			c$1 = s.charCodeAt((i + 1 >> 0));
+			if (c$1 < accept.lo || accept.hi < c$1) {
+				size = 1;
+			} else if (size === 2) {
+			} else {
+				c$2 = s.charCodeAt((i + 2 >> 0));
+				if (c$2 < 128 || 191 < c$2) {
+					size = 1;
+				} else if (size === 3) {
+				} else {
+					c$3 = s.charCodeAt((i + 3 >> 0));
+					if (c$3 < 128 || 191 < c$3) {
+						size = 1;
+					}
+				}
+			}
+			i = i + (size) >> 0;
+			n = n + (1) >> 0;
+		}
+		n = n;
+		return n;
+	};
+	$pkg.RuneCountInString = RuneCountInString;
 	RuneStart = function(b) {
 		var b;
 		return !((((b & 192) >>> 0) === 128));
@@ -6223,7 +6325,7 @@ $packages["unicode/utf8"] = (function() {
 	return $pkg;
 })();
 $packages["strings"] = (function() {
-	var $pkg = {}, $init, errors, js, io, sync, unicode, utf8, Builder, ptrType$1, sliceType$2, asciiSpace, Map, ToLower, TrimLeftFunc, TrimRightFunc, TrimFunc, indexFunc, lastIndexFunc, TrimSpace, Index;
+	var $pkg = {}, $init, errors, js, io, sync, unicode, utf8, Builder, sliceType, ptrType$1, sliceType$2, asciiSpace, explode, genSplit, Split, HasSuffix, Map, ToLower, isSeparator, Title, TrimLeftFunc, TrimRightFunc, TrimFunc, indexFunc, lastIndexFunc, TrimSpace, TrimSuffix, Index, Count;
 	errors = $packages["errors"];
 	js = $packages["github.com/gopherjs/gopherjs/js"];
 	io = $packages["io"];
@@ -6240,8 +6342,74 @@ $packages["strings"] = (function() {
 		this.addr = addr_;
 		this.buf = buf_;
 	});
+	sliceType = $sliceType($String);
 	ptrType$1 = $ptrType(Builder);
 	sliceType$2 = $sliceType($Uint8);
+	explode = function(s, n) {
+		var _tuple, a, ch, i, l, n, s, size, x;
+		l = utf8.RuneCountInString(s);
+		if (n < 0 || n > l) {
+			n = l;
+		}
+		a = $makeSlice(sliceType, n);
+		i = 0;
+		while (true) {
+			if (!(i < (n - 1 >> 0))) { break; }
+			_tuple = utf8.DecodeRuneInString(s);
+			ch = _tuple[0];
+			size = _tuple[1];
+			((i < 0 || i >= a.$length) ? ($throwRuntimeError("index out of range"), undefined) : a.$array[a.$offset + i] = $substring(s, 0, size));
+			s = $substring(s, size);
+			if (ch === 65533) {
+				((i < 0 || i >= a.$length) ? ($throwRuntimeError("index out of range"), undefined) : a.$array[a.$offset + i] = "\xEF\xBF\xBD");
+			}
+			i = i + (1) >> 0;
+		}
+		if (n > 0) {
+			(x = n - 1 >> 0, ((x < 0 || x >= a.$length) ? ($throwRuntimeError("index out of range"), undefined) : a.$array[a.$offset + x] = s));
+		}
+		return a;
+	};
+	genSplit = function(s, sep, sepSave, n) {
+		var a, i, m, n, s, sep, sepSave;
+		if (n === 0) {
+			return sliceType.nil;
+		}
+		if (sep === "") {
+			return explode(s, n);
+		}
+		if (n < 0) {
+			n = Count(s, sep) + 1 >> 0;
+		}
+		if (n > (s.length + 1 >> 0)) {
+			n = s.length + 1 >> 0;
+		}
+		a = $makeSlice(sliceType, n);
+		n = n - (1) >> 0;
+		i = 0;
+		while (true) {
+			if (!(i < n)) { break; }
+			m = Index(s, sep);
+			if (m < 0) {
+				break;
+			}
+			((i < 0 || i >= a.$length) ? ($throwRuntimeError("index out of range"), undefined) : a.$array[a.$offset + i] = $substring(s, 0, (m + sepSave >> 0)));
+			s = $substring(s, (m + sep.length >> 0));
+			i = i + (1) >> 0;
+		}
+		((i < 0 || i >= a.$length) ? ($throwRuntimeError("index out of range"), undefined) : a.$array[a.$offset + i] = s);
+		return $subslice(a, 0, (i + 1 >> 0));
+	};
+	Split = function(s, sep) {
+		var s, sep;
+		return genSplit(s, sep, 0, -1);
+	};
+	$pkg.Split = Split;
+	HasSuffix = function(s, suffix) {
+		var s, suffix;
+		return s.length >= suffix.length && $substring(s, (s.length - suffix.length >> 0)) === suffix;
+	};
+	$pkg.HasSuffix = HasSuffix;
 	Map = function(mapping, s) {
 		var {_i, _i$1, _r, _r$1, _ref, _ref$1, _rune, _rune$1, _tuple, b, c, c$1, i, mapping, r, r$1, s, width, $s, $r, $c} = $restore(this, {mapping, s});
 		/* */ $s = $s || 0; s: while (true) { switch ($s) { case 0:
@@ -6346,6 +6514,44 @@ $packages["strings"] = (function() {
 		/* */ } return; } var $f = {$blk: ToLower, $c: true, $r, $24r, _r, _tmp, _tmp$1, b, c, c$1, hasUpper, i, i$1, isASCII, s, $s};return $f;
 	};
 	$pkg.ToLower = ToLower;
+	isSeparator = function(r) {
+		var r;
+		if (r <= 127) {
+			if (48 <= r && r <= 57) {
+				return false;
+			} else if (97 <= r && r <= 122) {
+				return false;
+			} else if (65 <= r && r <= 90) {
+				return false;
+			} else if ((r === 95)) {
+				return false;
+			}
+			return true;
+		}
+		if (unicode.IsLetter(r) || unicode.IsDigit(r)) {
+			return false;
+		}
+		return unicode.IsSpace(r);
+	};
+	Title = function(s) {
+		var {$24r, _r, prev, s, $s, $r, $c} = $restore(this, {s});
+		/* */ $s = $s || 0; s: while (true) { switch ($s) { case 0:
+		prev = [prev];
+		prev[0] = 32;
+		_r = Map((function(prev) { return function(r) {
+			var r;
+			if (isSeparator(prev[0])) {
+				prev[0] = r;
+				return unicode.ToTitle(r);
+			}
+			prev[0] = r;
+			return r;
+		}; })(prev), s); /* */ $s = 1; case 1: if($c) { $c = false; _r = _r.$blk(); } if (_r && _r.$blk !== undefined) { break s; }
+		$24r = _r;
+		$s = 2; case 2: return $24r;
+		/* */ } return; } var $f = {$blk: Title, $c: true, $r, $24r, _r, prev, s, $s};return $f;
+	};
+	$pkg.Title = Title;
 	TrimLeftFunc = function(s, f) {
 		var {_r, f, i, s, $s, $r, $c} = $restore(this, {s, f});
 		/* */ $s = $s || 0; s: while (true) { switch ($s) { case 0:
@@ -6468,6 +6674,14 @@ $packages["strings"] = (function() {
 		/* */ } return; } var $f = {$blk: TrimSpace, $c: true, $r, $24r, $24r$1, _r, _r$1, c, c$1, s, start, stop, $s};return $f;
 	};
 	$pkg.TrimSpace = TrimSpace;
+	TrimSuffix = function(s, suffix) {
+		var s, suffix;
+		if (HasSuffix(s, suffix)) {
+			return $substring(s, 0, (s.length - suffix.length >> 0));
+		}
+		return s;
+	};
+	$pkg.TrimSuffix = TrimSuffix;
 	Builder.ptr.prototype.Len = function() {
 		var b;
 		b = this;
@@ -6553,6 +6767,30 @@ $packages["strings"] = (function() {
 		return $parseInt(s.indexOf(sep)) >> 0;
 	};
 	$pkg.Index = Index;
+	Count = function(s, sep) {
+		var n, pos, s, sep;
+		n = 0;
+		if ((sep.length === 0)) {
+			return utf8.RuneCountInString(s) + 1 >> 0;
+		} else if (sep.length > s.length) {
+			return 0;
+		} else if ((sep.length === s.length)) {
+			if (sep === s) {
+				return 1;
+			}
+			return 0;
+		}
+		while (true) {
+			pos = Index(s, sep);
+			if (pos === -1) {
+				break;
+			}
+			n = n + (1) >> 0;
+			s = $substring(s, (pos + sep.length >> 0));
+		}
+		return n;
+	};
+	$pkg.Count = Count;
 	Builder.ptr.prototype.String = function() {
 		var b;
 		b = this;
@@ -6587,26 +6825,14 @@ $packages["strings"] = (function() {
 	return $pkg;
 })();
 $packages["overword"] = (function() {
-	var $pkg = {}, $init, js, sort, strings, Config, Highlighter, Match, ptrType, ptrType$1, funcType, funcType$1, sliceType, mapType, sliceType$1, ptrType$2, sliceType$2, highlighter, main, initHighlighter, addDefaultCSS, stopHighlighter, removeHighlights;
+	var $pkg = {}, $init, js, sort, strings, Highlighter, WordSet, Config, Match, ptrType, structType, sliceType, ptrType$1, sliceType$2, ptrType$2, mapType, funcType, ptrType$3, sliceType$3, ptrType$4, sliceType$4, sliceType$5, funcType$1, highlighter, body, unsafeWindow, console, gmConfig, predefinedSets, main, initHighlighter, containsHighlightClass, hasDescendantWithClass, addDefaultCSS, removeHighlights, init, parseWords;
 	js = $packages["github.com/gopherjs/gopherjs/js"];
 	sort = $packages["sort"];
 	strings = $packages["strings"];
-	Config = $pkg.Config = $newType(0, $kindStruct, "main.Config", true, "overword", true, function(Words_, HighlightClass_, DebounceTime_) {
-		this.$val = this;
-		if (arguments.length === 0) {
-			this.Words = sliceType.nil;
-			this.HighlightClass = "";
-			this.DebounceTime = 0;
-			return;
-		}
-		this.Words = Words_;
-		this.HighlightClass = HighlightClass_;
-		this.DebounceTime = DebounceTime_;
-	});
 	Highlighter = $pkg.Highlighter = $newType(0, $kindStruct, "main.Highlighter", true, "overword", true, function(config_, observer_, debounceID_) {
 		this.$val = this;
 		if (arguments.length === 0) {
-			this.config = new Config.ptr(sliceType.nil, "", 0);
+			this.config = ptrType$2.nil;
 			this.observer = null;
 			this.debounceID = null;
 			return;
@@ -6615,70 +6841,140 @@ $packages["overword"] = (function() {
 		this.observer = observer_;
 		this.debounceID = debounceID_;
 	});
-	Match = $newType(0, $kindStruct, "main.Match", true, "overword", true, function(Start_, End_, Word_) {
+	WordSet = $pkg.WordSet = $newType(0, $kindStruct, "main.WordSet", true, "overword", true, function(Code_, Words_, BackgroundColor_, TextColor_) {
+		this.$val = this;
+		if (arguments.length === 0) {
+			this.Code = "";
+			this.Words = sliceType$5.nil;
+			this.BackgroundColor = "";
+			this.TextColor = "";
+			return;
+		}
+		this.Code = Code_;
+		this.Words = Words_;
+		this.BackgroundColor = BackgroundColor_;
+		this.TextColor = TextColor_;
+	});
+	Config = $pkg.Config = $newType(0, $kindStruct, "main.Config", true, "overword", true, function(WordSets_, HighlightClass_, DebounceTime_, gmc_) {
+		this.$val = this;
+		if (arguments.length === 0) {
+			this.WordSets = sliceType$2.nil;
+			this.HighlightClass = "";
+			this.DebounceTime = 0;
+			this.gmc = null;
+			return;
+		}
+		this.WordSets = WordSets_;
+		this.HighlightClass = HighlightClass_;
+		this.DebounceTime = DebounceTime_;
+		this.gmc = gmc_;
+	});
+	Match = $newType(0, $kindStruct, "main.Match", true, "overword", true, function(Start_, End_, Word_, WordSet_) {
 		this.$val = this;
 		if (arguments.length === 0) {
 			this.Start = 0;
 			this.End = 0;
 			this.Word = "";
+			this.WordSet = new WordSet.ptr("", sliceType$5.nil, "", "");
 			return;
 		}
 		this.Start = Start_;
 		this.End = End_;
 		this.Word = Word_;
+		this.WordSet = WordSet_;
 	});
 	ptrType = $ptrType(Highlighter);
-	ptrType$1 = $ptrType(js.Object);
-	funcType = $funcType([ptrType$1], [], false);
-	funcType$1 = $funcType([], [], false);
-	sliceType = $sliceType($String);
+	structType = $structType("", [{prop: "Code", name: "Code", embedded: false, exported: true, typ: $String, tag: ""}, {prop: "Name", name: "Name", embedded: false, exported: true, typ: $String, tag: ""}, {prop: "BackgroundColor", name: "BackgroundColor", embedded: false, exported: true, typ: $String, tag: ""}, {prop: "TextColor", name: "TextColor", embedded: false, exported: true, typ: $String, tag: ""}]);
+	sliceType = $sliceType(structType);
+	ptrType$1 = $ptrType(WordSet);
+	sliceType$2 = $sliceType(ptrType$1);
+	ptrType$2 = $ptrType(Config);
 	mapType = $mapType($String, $emptyInterface);
-	sliceType$1 = $sliceType(ptrType$1);
-	ptrType$2 = $ptrType(sliceType$1);
-	sliceType$2 = $sliceType(Match);
+	funcType = $funcType([], [], false);
+	ptrType$3 = $ptrType(js.Object);
+	sliceType$3 = $sliceType(ptrType$3);
+	ptrType$4 = $ptrType(sliceType$3);
+	sliceType$4 = $sliceType(Match);
+	sliceType$5 = $sliceType($String);
+	funcType$1 = $funcType([ptrType$3], [], false);
 	main = function() {
-		$global.initHighlighter = $externalize(initHighlighter, funcType);
-		$global.stopHighlighter = $externalize(stopHighlighter, funcType$1);
-		$global.initHighlighter();
-	};
-	initHighlighter = function(wordsObj) {
-		var {config, i, word, words, wordsObj, $s, $r, $c} = $restore(this, {wordsObj});
+		var {$s, $r, $c} = $restore(this, {});
 		/* */ $s = $s || 0; s: while (true) { switch ($s) { case 0:
-		words = sliceType.nil;
-		if (!(wordsObj === null) && !(wordsObj === undefined)) {
-			i = 0;
-			while (true) {
-				if (!(i < $parseInt(wordsObj.length))) { break; }
-				word = $internalize(wordsObj[i], $String);
-				if (!(word === "")) {
-					words = $append(words, word);
-				}
-				i = i + (1) >> 0;
-			}
-		}
-		if (words.$length === 0) {
-			words = new sliceType(["\xD0\xB2\xD0\xB0\xD0\xB6\xD0\xBD\xD0\xBE", "\xD1\x81\xD1\x80\xD0\xBE\xD1\x87\xD0\xBD\xD0\xBE", "\xD0\xB2\xD0\xBD\xD0\xB8\xD0\xBC\xD0\xB0\xD0\xBD\xD0\xB8\xD0\xB5"]);
-		}
-		config = new Config.ptr(words, "highlightClass", 200);
-		highlighter = new Highlighter.ptr($clone(config, Config), null, null);
+		$r = initHighlighter(); /* */ $s = 1; case 1: if($c) { $c = false; $r = $r.$blk(); } if ($r && $r.$blk !== undefined) { break s; }
+		$s = -1; return;
+		/* */ } return; } var $f = {$blk: main, $c: true, $r, $s};return $f;
+	};
+	initHighlighter = function() {
+		var {config, $s, $r, $c} = $restore(this, {});
+		/* */ $s = $s || 0; s: while (true) { switch ($s) { case 0:
+		config = new Config.ptr(sliceType$2.nil, "highlightClass", 1000, null);
+		$r = config.Register(); /* */ $s = 1; case 1: if($c) { $c = false; $r = $r.$blk(); } if ($r && $r.$blk !== undefined) { break s; }
+		$r = config.Load(); /* */ $s = 2; case 2: if($c) { $c = false; $r = $r.$blk(); } if ($r && $r.$blk !== undefined) { break s; }
+		$r = config.AddListener((function $b() {
+			var {$s, $r, $c} = $restore(this, {});
+			/* */ $s = $s || 0; s: while (true) { switch ($s) { case 0:
+			$r = highlighter.parseAndHighlight(body, true); /* */ $s = 1; case 1: if($c) { $c = false; $r = $r.$blk(); } if ($r && $r.$blk !== undefined) { break s; }
+			$s = -1; return;
+			/* */ } return; } var $f = {$blk: $b, $c: true, $r, $s};return $f;
+		})); /* */ $s = 3; case 3: if($c) { $c = false; $r = $r.$blk(); } if ($r && $r.$blk !== undefined) { break s; }
+		highlighter = new Highlighter.ptr(config, null, null);
 		addDefaultCSS(config.HighlightClass);
-		$r = highlighter.searchAndHighlight($global.document.body); /* */ $s = 1; case 1: if($c) { $c = false; $r = $r.$blk(); } if ($r && $r.$blk !== undefined) { break s; }
+		$r = highlighter.parseAndHighlight(body, false); /* */ $s = 4; case 4: if($c) { $c = false; $r = $r.$blk(); } if ($r && $r.$blk !== undefined) { break s; }
 		highlighter.observeDOMChanges();
 		$s = -1; return;
-		/* */ } return; } var $f = {$blk: initHighlighter, $c: true, $r, config, i, word, words, wordsObj, $s};return $f;
+		/* */ } return; } var $f = {$blk: initHighlighter, $c: true, $r, config, $s};return $f;
 	};
 	Highlighter.ptr.prototype.observeDOMChanges = function() {
 		var cb, h;
 		h = this;
 		cb = js.MakeFunc((function(this$1, args) {
-			var args, this$1;
-			h.debounceHighlight();
+			var args, i, record, records, this$1;
+			records = (0 >= args.$length ? ($throwRuntimeError("index out of range"), undefined) : args.$array[args.$offset + 0]);
+			i = 0;
+			while (true) {
+				if (!(i < $parseInt(records.length))) { break; }
+				record = records[i];
+				if (containsHighlightClass(record.addedNodes, h.config.HighlightClass)) {
+					i = i + (1) >> 0;
+					continue;
+				}
+				if (containsHighlightClass(record.removedNodes, h.config.HighlightClass)) {
+					i = i + (1) >> 0;
+					continue;
+				}
+				h.debounceHighlight();
+				break;
+			}
 			return $ifaceNil;
 		}));
 		h.observer = new ($global.MutationObserver)(cb);
-		h.observer.observe($global.document.body, $externalize($makeMap($String.keyFor, [{ k: "childList", v: new $Bool(true) }, { k: "subtree", v: new $Bool(true) }, { k: "characterData", v: new $Bool(true) }]), mapType));
+		h.observer.observe(body, $externalize($makeMap($String.keyFor, [{ k: "childList", v: new $Bool(true) }, { k: "subtree", v: new $Bool(true) }, { k: "characterData", v: new $Bool(true) }]), mapType));
 	};
 	Highlighter.prototype.observeDOMChanges = function() { return this.$val.observeDOMChanges(); };
+	containsHighlightClass = function(nodeList, className) {
+		var className, i, node, nodeList;
+		i = 0;
+		while (true) {
+			if (!(i < $parseInt(nodeList.length))) { break; }
+			node = nodeList[i];
+			if (!(node.classList === undefined) && !!(node.classList.contains($externalize(className, $String)))) {
+				return true;
+			}
+			if (hasDescendantWithClass(node, className)) {
+				return true;
+			}
+			i = i + (1) >> 0;
+		}
+		return false;
+	};
+	hasDescendantWithClass = function(node, className) {
+		var className, found, node;
+		if (node.querySelector === undefined) {
+			return false;
+		}
+		found = node.querySelector($externalize("." + className, $String));
+		return !(found === null) && !(found === undefined);
+	};
 	Highlighter.ptr.prototype.debounceHighlight = function() {
 		var h;
 		h = this;
@@ -6688,10 +6984,10 @@ $packages["overword"] = (function() {
 		h.debounceID = $global.setTimeout($externalize((function $b() {
 			var {$s, $r, $c} = $restore(this, {});
 			/* */ $s = $s || 0; s: while (true) { switch ($s) { case 0:
-			$r = h.searchAndHighlight($global.document.body); /* */ $s = 1; case 1: if($c) { $c = false; $r = $r.$blk(); } if ($r && $r.$blk !== undefined) { break s; }
+			$r = h.parseAndHighlight(body, true); /* */ $s = 1; case 1: if($c) { $c = false; $r = $r.$blk(); } if ($r && $r.$blk !== undefined) { break s; }
 			$s = -1; return;
 			/* */ } return; } var $f = {$blk: $b, $c: true, $r, $s};return $f;
-		}), funcType$1), h.config.DebounceTime);
+		}), funcType), h.config.DebounceTime);
 	};
 	Highlighter.prototype.debounceHighlight = function() { return this.$val.debounceHighlight(); };
 	Highlighter.ptr.prototype.collectTextNodes = function(node, result) {
@@ -6724,13 +7020,16 @@ $packages["overword"] = (function() {
 		/* */ } return; } var $f = {$blk: Highlighter.ptr.prototype.collectTextNodes, $c: true, $r, _r, child, children, h, i, node, nodeType, result, tag, $s};return $f;
 	};
 	Highlighter.prototype.collectTextNodes = function(node, result) { return this.$val.collectTextNodes(node, result); };
-	Highlighter.ptr.prototype.searchAndHighlight = function(root) {
-		var {_i, _ref, h, node, root, textNodes, $s, $r, $c} = $restore(this, {root});
+	Highlighter.ptr.prototype.parseAndHighlight = function(root, clear) {
+		var {_i, _ref, clear, h, node, root, textNodes, $s, $r, $c} = $restore(this, {root, clear});
 		/* */ $s = $s || 0; s: while (true) { switch ($s) { case 0:
 		textNodes = [textNodes];
 		h = this;
-		textNodes[0] = sliceType$1.nil;
-		$r = h.collectTextNodes(root, (textNodes.$ptr || (textNodes.$ptr = new ptrType$2(function() { return this.$target[0]; }, function($v) { this.$target[0] = $v; }, textNodes)))); /* */ $s = 1; case 1: if($c) { $c = false; $r = $r.$blk(); } if ($r && $r.$blk !== undefined) { break s; }
+		if (clear) {
+			removeHighlights(h.config.HighlightClass);
+		}
+		textNodes[0] = sliceType$3.nil;
+		$r = h.collectTextNodes(root, (textNodes.$ptr || (textNodes.$ptr = new ptrType$4(function() { return this.$target[0]; }, function($v) { this.$target[0] = $v; }, textNodes)))); /* */ $s = 1; case 1: if($c) { $c = false; $r = $r.$blk(); } if ($r && $r.$blk !== undefined) { break s; }
 		_ref = textNodes[0];
 		_i = 0;
 		/* while (true) { */ case 2:
@@ -6741,11 +7040,11 @@ $packages["overword"] = (function() {
 		$s = 2; continue;
 		case 3:
 		$s = -1; return;
-		/* */ } return; } var $f = {$blk: Highlighter.ptr.prototype.searchAndHighlight, $c: true, $r, _i, _ref, h, node, root, textNodes, $s};return $f;
+		/* */ } return; } var $f = {$blk: Highlighter.ptr.prototype.parseAndHighlight, $c: true, $r, _i, _ref, clear, h, node, root, textNodes, $s};return $f;
 	};
-	Highlighter.prototype.searchAndHighlight = function(root) { return this.$val.searchAndHighlight(root); };
+	Highlighter.prototype.parseAndHighlight = function(root, clear) { return this.$val.parseAndHighlight(root, clear); };
 	Highlighter.ptr.prototype.highlightTextNode = function(textNode) {
-		var {_i, _i$1, _i$2, _r, _r$1, _r$2, _ref, _ref$1, _ref$2, doc, end, fragment, h, idx, last, lowerText, m, m$1, matches, merged, parent, pos, prev, span, start, text, textNode, word, wordLower, x, x$1, $s, $r, $c} = $restore(this, {textNode});
+		var {_i, _i$1, _i$2, _i$3, _r, _r$1, _r$2, _ref, _ref$1, _ref$2, _ref$3, doc, end, fragment, h, idx, last, lowerText, m, m$1, matches, merged, parent, pos, prev, span, start, text, textNode, word, wordLower, ws, x, x$1, $s, $r, $c} = $restore(this, {textNode});
 		/* */ $s = $s || 0; s: while (true) { switch ($s) { case 0:
 		matches = [matches];
 		h = this;
@@ -6753,34 +7052,41 @@ $packages["overword"] = (function() {
 		if (text === "") {
 			$s = -1; return;
 		}
-		$global.console.log(textNode);
-		matches[0] = sliceType$2.nil;
+		matches[0] = sliceType$4.nil;
 		_r = strings.ToLower(text); /* */ $s = 1; case 1: if($c) { $c = false; _r = _r.$blk(); } if (_r && _r.$blk !== undefined) { break s; }
 		lowerText = _r;
-		_ref = h.config.Words;
+		_ref = h.config.WordSets;
 		_i = 0;
 		/* while (true) { */ case 2:
 			/* if (!(_i < _ref.$length)) { break; } */ if(!(_i < _ref.$length)) { $s = 3; continue; }
-			word = ((_i < 0 || _i >= _ref.$length) ? ($throwRuntimeError("index out of range"), undefined) : _ref.$array[_ref.$offset + _i]);
-			_r$1 = strings.TrimSpace(word); /* */ $s = 4; case 4: if($c) { $c = false; _r$1 = _r$1.$blk(); } if (_r$1 && _r$1.$blk !== undefined) { break s; }
-			word = _r$1;
-			if (word === "") {
-				_i++;
-				/* continue; */ $s = 2; continue;
-			}
-			_r$2 = strings.ToLower(word); /* */ $s = 5; case 5: if($c) { $c = false; _r$2 = _r$2.$blk(); } if (_r$2 && _r$2.$blk !== undefined) { break s; }
-			wordLower = _r$2;
-			idx = 0;
-			while (true) {
-				pos = strings.Index($substring(lowerText, idx), wordLower);
-				if (pos === -1) {
-					break;
+			ws = ((_i < 0 || _i >= _ref.$length) ? ($throwRuntimeError("index out of range"), undefined) : _ref.$array[_ref.$offset + _i]);
+			_ref$1 = ws.Words;
+			_i$1 = 0;
+			/* while (true) { */ case 4:
+				/* if (!(_i$1 < _ref$1.$length)) { break; } */ if(!(_i$1 < _ref$1.$length)) { $s = 5; continue; }
+				word = ((_i$1 < 0 || _i$1 >= _ref$1.$length) ? ($throwRuntimeError("index out of range"), undefined) : _ref$1.$array[_ref$1.$offset + _i$1]);
+				_r$1 = strings.TrimSpace(word); /* */ $s = 6; case 6: if($c) { $c = false; _r$1 = _r$1.$blk(); } if (_r$1 && _r$1.$blk !== undefined) { break s; }
+				word = _r$1;
+				if (word === "") {
+					_i$1++;
+					/* continue; */ $s = 4; continue;
 				}
-				start = idx + pos >> 0;
-				end = start + word.length >> 0;
-				matches[0] = $append(matches[0], new Match.ptr(start, end, $substring(text, start, end)));
-				idx = end;
-			}
+				_r$2 = strings.ToLower(word); /* */ $s = 7; case 7: if($c) { $c = false; _r$2 = _r$2.$blk(); } if (_r$2 && _r$2.$blk !== undefined) { break s; }
+				wordLower = _r$2;
+				idx = 0;
+				while (true) {
+					pos = strings.Index($substring(lowerText, idx), wordLower);
+					if (pos === -1) {
+						break;
+					}
+					start = idx + pos >> 0;
+					end = start + word.length >> 0;
+					matches[0] = $append(matches[0], new Match.ptr(start, end, $substring(text, start, end), $clone(ws, WordSet)));
+					idx = end;
+				}
+				_i$1++;
+			$s = 4; continue;
+			case 5:
 			_i++;
 		$s = 2; continue;
 		case 3:
@@ -6790,14 +7096,13 @@ $packages["overword"] = (function() {
 		$r = sort.Slice(matches[0], (function(matches) { return function(i, j) {
 			var i, j;
 			return ((i < 0 || i >= matches[0].$length) ? ($throwRuntimeError("index out of range"), undefined) : matches[0].$array[matches[0].$offset + i]).Start < ((j < 0 || j >= matches[0].$length) ? ($throwRuntimeError("index out of range"), undefined) : matches[0].$array[matches[0].$offset + j]).Start;
-		}; })(matches)); /* */ $s = 6; case 6: if($c) { $c = false; $r = $r.$blk(); } if ($r && $r.$blk !== undefined) { break s; }
-		$global.console.log($externalize(matches[0], sliceType$2));
-		merged = sliceType$2.nil;
-		_ref$1 = matches[0];
-		_i$1 = 0;
+		}; })(matches)); /* */ $s = 8; case 8: if($c) { $c = false; $r = $r.$blk(); } if ($r && $r.$blk !== undefined) { break s; }
+		merged = sliceType$4.nil;
+		_ref$2 = matches[0];
+		_i$2 = 0;
 		while (true) {
-			if (!(_i$1 < _ref$1.$length)) { break; }
-			m = $clone(((_i$1 < 0 || _i$1 >= _ref$1.$length) ? ($throwRuntimeError("index out of range"), undefined) : _ref$1.$array[_ref$1.$offset + _i$1]), Match);
+			if (!(_i$2 < _ref$2.$length)) { break; }
+			m = $clone(((_i$2 < 0 || _i$2 >= _ref$2.$length) ? ($throwRuntimeError("index out of range"), undefined) : _ref$2.$array[_ref$2.$offset + _i$2]), Match);
 			if ((merged.$length === 0) || m.Start >= (x = merged.$length - 1 >> 0, ((x < 0 || x >= merged.$length) ? ($throwRuntimeError("index out of range"), undefined) : merged.$array[merged.$offset + x])).End) {
 				merged = $append(merged, m);
 			} else {
@@ -6806,26 +7111,27 @@ $packages["overword"] = (function() {
 					last.End = m.End;
 				}
 			}
-			_i$1++;
+			_i$2++;
 		}
-		$global.console.log($externalize(merged, sliceType$2));
 		doc = $global.document;
 		fragment = doc.createDocumentFragment();
 		prev = 0;
-		_ref$2 = merged;
-		_i$2 = 0;
+		_ref$3 = merged;
+		_i$3 = 0;
 		while (true) {
-			if (!(_i$2 < _ref$2.$length)) { break; }
-			m$1 = $clone(((_i$2 < 0 || _i$2 >= _ref$2.$length) ? ($throwRuntimeError("index out of range"), undefined) : _ref$2.$array[_ref$2.$offset + _i$2]), Match);
+			if (!(_i$3 < _ref$3.$length)) { break; }
+			m$1 = $clone(((_i$3 < 0 || _i$3 >= _ref$3.$length) ? ($throwRuntimeError("index out of range"), undefined) : _ref$3.$array[_ref$3.$offset + _i$3]), Match);
 			if (m$1.Start > prev) {
 				fragment.appendChild(doc.createTextNode($externalize($substring(text, prev, m$1.Start), $String)));
 			}
 			span = doc.createElement($externalize("span", $String));
 			span.classList.add($externalize(h.config.HighlightClass, $String));
+			span.style[$externalize("background-color", $String)] = $externalize(m$1.WordSet.BackgroundColor, $String);
+			span.style.color = $externalize(m$1.WordSet.TextColor, $String);
 			span.textContent = $externalize($substring(text, m$1.Start, m$1.End), $String);
 			fragment.appendChild(span);
 			prev = m$1.End;
-			_i$2++;
+			_i$3++;
 		}
 		if (prev < text.length) {
 			fragment.appendChild(doc.createTextNode($externalize($substring(text, prev), $String)));
@@ -6835,7 +7141,7 @@ $packages["overword"] = (function() {
 			parent.replaceChild(fragment, textNode);
 		}
 		$s = -1; return;
-		/* */ } return; } var $f = {$blk: Highlighter.ptr.prototype.highlightTextNode, $c: true, $r, _i, _i$1, _i$2, _r, _r$1, _r$2, _ref, _ref$1, _ref$2, doc, end, fragment, h, idx, last, lowerText, m, m$1, matches, merged, parent, pos, prev, span, start, text, textNode, word, wordLower, x, x$1, $s};return $f;
+		/* */ } return; } var $f = {$blk: Highlighter.ptr.prototype.highlightTextNode, $c: true, $r, _i, _i$1, _i$2, _i$3, _r, _r$1, _r$2, _ref, _ref$1, _ref$2, _ref$3, doc, end, fragment, h, idx, last, lowerText, m, m$1, matches, merged, parent, pos, prev, span, start, text, textNode, word, wordLower, ws, x, x$1, $s};return $f;
 	};
 	Highlighter.prototype.highlightTextNode = function(textNode) { return this.$val.highlightTextNode(textNode); };
 	addDefaultCSS = function(className) {
@@ -6846,14 +7152,8 @@ $packages["overword"] = (function() {
 		}
 		style = $global.document.createElement($externalize("style", $String));
 		style.id = $externalize(styleID, $String);
-		style.textContent = $externalize("." + className + " { background-color: yellow; color: black; }", $String);
+		style.textContent = $externalize("." + className + " { }", $String);
 		$global.document.head.appendChild(style);
-	};
-	stopHighlighter = function() {
-		if (!(highlighter === ptrType.nil) && !(highlighter.observer === null)) {
-			highlighter.observer.disconnect();
-		}
-		removeHighlights("highlightClass");
 	};
 	removeHighlights = function(className) {
 		var className, doc, highlight, i, nodes, parent, text, textNode;
@@ -6868,14 +7168,136 @@ $packages["overword"] = (function() {
 				text = highlight.textContent;
 				textNode = doc.createTextNode(text);
 				parent.replaceChild(textNode, highlight);
+				parent.normalize();
 			}
 			i = i + (1) >> 0;
 		}
 	};
-	ptrType.methods = [{prop: "observeDOMChanges", name: "observeDOMChanges", pkg: "overword", typ: $funcType([], [], false)}, {prop: "debounceHighlight", name: "debounceHighlight", pkg: "overword", typ: $funcType([], [], false)}, {prop: "collectTextNodes", name: "collectTextNodes", pkg: "overword", typ: $funcType([ptrType$1, ptrType$2], [], false)}, {prop: "searchAndHighlight", name: "searchAndHighlight", pkg: "overword", typ: $funcType([ptrType$1], [], false)}, {prop: "highlightTextNode", name: "highlightTextNode", pkg: "overword", typ: $funcType([ptrType$1], [], false)}];
-	Config.init("", [{prop: "Words", name: "Words", embedded: false, exported: true, typ: sliceType, tag: ""}, {prop: "HighlightClass", name: "HighlightClass", embedded: false, exported: true, typ: $String, tag: ""}, {prop: "DebounceTime", name: "DebounceTime", embedded: false, exported: true, typ: $Int, tag: ""}]);
-	Highlighter.init("overword", [{prop: "config", name: "config", embedded: false, exported: false, typ: Config, tag: ""}, {prop: "observer", name: "observer", embedded: false, exported: false, typ: ptrType$1, tag: ""}, {prop: "debounceID", name: "debounceID", embedded: false, exported: false, typ: ptrType$1, tag: ""}]);
-	Match.init("", [{prop: "Start", name: "Start", embedded: false, exported: true, typ: $Int, tag: ""}, {prop: "End", name: "End", embedded: false, exported: true, typ: $Int, tag: ""}, {prop: "Word", name: "Word", embedded: false, exported: true, typ: $String, tag: ""}]);
+	init = function() {
+		body = $global.document.body;
+		console = $global.console;
+		unsafeWindow = $global.unsafeWindow;
+		gmConfig = unsafeWindow.GM_config;
+	};
+	Config.ptr.prototype.Register = function() {
+		var {_i, _key, _r, _r$1, _ref, cfg, def, slotFactory, slots, $s, $r, $c} = $restore(this, {});
+		/* */ $s = $s || 0; s: while (true) { switch ($s) { case 0:
+		cfg = this;
+		slotFactory = (function(name) {
+			var name;
+			return $makeMap($String.keyFor, [{ k: "name", v: new $String("\xD0\x9A\xD0\xB0\xD1\x82\xD0\xB5\xD0\xB3\xD0\xBE\xD1\x80\xD0\xB8\xD1\x8F: " + name) }, { k: "type", v: new $String("folder") }, { k: "items", v: new mapType($makeMap($String.keyFor, [{ k: "words", v: new mapType($makeMap($String.keyFor, [{ k: "name", v: new $String("\xD0\xA1\xD0\xBB\xD0\xBE\xD0\xB2\xD0\xB0 (\xD1\x87\xD0\xB5\xD1\x80\xD0\xB5\xD0\xB7 \xD0\xB7\xD0\xB0\xD0\xBF\xD1\x8F\xD1\x82\xD1\x83\xD1\x8E)") }, { k: "type", v: new $String("str") }])) }])) }]);
+		});
+		slots = new $global.Map();
+		_ref = predefinedSets;
+		_i = 0;
+		/* while (true) { */ case 1:
+			/* if (!(_i < _ref.$length)) { break; } */ if(!(_i < _ref.$length)) { $s = 2; continue; }
+			def = $clone(((_i < 0 || _i >= _ref.$length) ? ($throwRuntimeError("index out of range"), undefined) : _ref.$array[_ref.$offset + _i]), structType);
+			_r = strings.Title(def.Name); /* */ $s = 3; case 3: if($c) { $c = false; _r = _r.$blk(); } if (_r && _r.$blk !== undefined) { break s; }
+			_r$1 = slotFactory(_r); /* */ $s = 4; case 4: if($c) { $c = false; _r$1 = _r$1.$blk(); } if (_r$1 && _r$1.$blk !== undefined) { break s; }
+			_key = def.Code; (slots || $throwRuntimeError("assignment to entry in nil map")).set($String.keyFor(_key), { k: _key, v: new mapType(_r$1) });
+			_i++;
+		$s = 1; continue;
+		case 2:
+		cfg.gmc = new (gmConfig)($externalize(slots, mapType));
+		$s = -1; return;
+		/* */ } return; } var $f = {$blk: Config.ptr.prototype.Register, $c: true, $r, _i, _key, _r, _r$1, _ref, cfg, def, slotFactory, slots, $s};return $f;
+	};
+	Config.prototype.Register = function() { return this.$val.Register(); };
+	Config.ptr.prototype.Load = function() {
+		var {_i, _r, _ref, cfg, def, raw, words, $s, $r, $c} = $restore(this, {});
+		/* */ $s = $s || 0; s: while (true) { switch ($s) { case 0:
+		cfg = this;
+		/* */ if (cfg.gmc === null) { $s = 1; continue; }
+		/* */ $s = 2; continue;
+		/* if (cfg.gmc === null) { */ case 1:
+			$r = cfg.Register(); /* */ $s = 3; case 3: if($c) { $c = false; $r = $r.$blk(); } if ($r && $r.$blk !== undefined) { break s; }
+		/* } */ case 2:
+		cfg.WordSets = $makeSlice(sliceType$2, 0, predefinedSets.$length);
+		_ref = predefinedSets;
+		_i = 0;
+		/* while (true) { */ case 4:
+			/* if (!(_i < _ref.$length)) { break; } */ if(!(_i < _ref.$length)) { $s = 5; continue; }
+			def = $clone(((_i < 0 || _i >= _ref.$length) ? ($throwRuntimeError("index out of range"), undefined) : _ref.$array[_ref.$offset + _i]), structType);
+			raw = $internalize(cfg.gmc.get($externalize(def.Code + ".words", $String)), $String);
+			_r = parseWords(raw); /* */ $s = 6; case 6: if($c) { $c = false; _r = _r.$blk(); } if (_r && _r.$blk !== undefined) { break s; }
+			words = _r;
+			cfg.WordSets = $append(cfg.WordSets, new WordSet.ptr(def.Code, words, def.BackgroundColor, def.TextColor));
+			_i++;
+		$s = 4; continue;
+		case 5:
+		$s = -1; return;
+		/* */ } return; } var $f = {$blk: Config.ptr.prototype.Load, $c: true, $r, _i, _r, _ref, cfg, def, raw, words, $s};return $f;
+	};
+	Config.prototype.Load = function() { return this.$val.Load(); };
+	Config.ptr.prototype.AddListener = function(callback) {
+		var {callback, cfg, $s, $r, $c} = $restore(this, {callback});
+		/* */ $s = $s || 0; s: while (true) { switch ($s) { case 0:
+		callback = [callback];
+		cfg = [cfg];
+		cfg[0] = this;
+		/* */ if (cfg[0].gmc === null) { $s = 1; continue; }
+		/* */ $s = 2; continue;
+		/* if (cfg[0].gmc === null) { */ case 1:
+			$r = cfg[0].Register(); /* */ $s = 3; case 3: if($c) { $c = false; $r = $r.$blk(); } if ($r && $r.$blk !== undefined) { break s; }
+		/* } */ case 2:
+		cfg[0].gmc.addEventListener($externalize("set", $String), $externalize((function(callback, cfg) { return function $b(e) {
+			var {_r, e, prop, setCode, value, wordSet, $s, $r, $c} = $restore(this, {e});
+			/* */ $s = $s || 0; s: while (true) { switch ($s) { case 0:
+			prop = $internalize(e.detail.prop, $String);
+			if (!strings.HasSuffix(prop, ".words")) {
+				$s = -1; return;
+			}
+			setCode = strings.TrimSuffix(prop, ".words");
+			wordSet = cfg[0].findWordSet(setCode);
+			if (wordSet === ptrType$1.nil) {
+				$s = -1; return;
+			}
+			value = $internalize(e.detail.after, $String);
+			_r = parseWords(value); /* */ $s = 1; case 1: if($c) { $c = false; _r = _r.$blk(); } if (_r && _r.$blk !== undefined) { break s; }
+			wordSet.Words = _r;
+			$r = callback[0](); /* */ $s = 2; case 2: if($c) { $c = false; $r = $r.$blk(); } if ($r && $r.$blk !== undefined) { break s; }
+			$s = -1; return;
+			/* */ } return; } var $f = {$blk: $b, $c: true, $r, _r, e, prop, setCode, value, wordSet, $s};return $f;
+		}; })(callback, cfg), funcType$1));
+		$s = -1; return;
+		/* */ } return; } var $f = {$blk: Config.ptr.prototype.AddListener, $c: true, $r, callback, cfg, $s};return $f;
+	};
+	Config.prototype.AddListener = function(callback) { return this.$val.AddListener(callback); };
+	Config.ptr.prototype.findWordSet = function(code) {
+		var _i, _ref, cfg, code, ws;
+		cfg = this;
+		_ref = cfg.WordSets;
+		_i = 0;
+		while (true) {
+			if (!(_i < _ref.$length)) { break; }
+			ws = ((_i < 0 || _i >= _ref.$length) ? ($throwRuntimeError("index out of range"), undefined) : _ref.$array[_ref.$offset + _i]);
+			if (ws.Code === code) {
+				return ws;
+			}
+			_i++;
+		}
+		return ptrType$1.nil;
+	};
+	Config.prototype.findWordSet = function(code) { return this.$val.findWordSet(code); };
+	parseWords = function(value) {
+		var {_r, value, $s, $r, $c} = $restore(this, {value});
+		/* */ $s = $s || 0; s: while (true) { switch ($s) { case 0:
+		_r = strings.TrimSpace(value); /* */ $s = 3; case 3: if($c) { $c = false; _r = _r.$blk(); } if (_r && _r.$blk !== undefined) { break s; }
+		/* */ if (_r === "") { $s = 1; continue; }
+		/* */ $s = 2; continue;
+		/* if (_r === "") { */ case 1:
+			$s = -1; return sliceType$5.nil;
+		/* } */ case 2:
+		$s = -1; return strings.Split(value, ",");
+		/* */ } return; } var $f = {$blk: parseWords, $c: true, $r, _r, value, $s};return $f;
+	};
+	ptrType.methods = [{prop: "observeDOMChanges", name: "observeDOMChanges", pkg: "overword", typ: $funcType([], [], false)}, {prop: "debounceHighlight", name: "debounceHighlight", pkg: "overword", typ: $funcType([], [], false)}, {prop: "collectTextNodes", name: "collectTextNodes", pkg: "overword", typ: $funcType([ptrType$3, ptrType$4], [], false)}, {prop: "parseAndHighlight", name: "parseAndHighlight", pkg: "overword", typ: $funcType([ptrType$3, $Bool], [], false)}, {prop: "highlightTextNode", name: "highlightTextNode", pkg: "overword", typ: $funcType([ptrType$3], [], false)}];
+	ptrType$2.methods = [{prop: "Register", name: "Register", pkg: "", typ: $funcType([], [], false)}, {prop: "Load", name: "Load", pkg: "", typ: $funcType([], [], false)}, {prop: "AddListener", name: "AddListener", pkg: "", typ: $funcType([funcType], [], false)}, {prop: "findWordSet", name: "findWordSet", pkg: "overword", typ: $funcType([$String], [ptrType$1], false)}];
+	Highlighter.init("overword", [{prop: "config", name: "config", embedded: false, exported: false, typ: ptrType$2, tag: ""}, {prop: "observer", name: "observer", embedded: false, exported: false, typ: ptrType$3, tag: ""}, {prop: "debounceID", name: "debounceID", embedded: false, exported: false, typ: ptrType$3, tag: ""}]);
+	WordSet.init("", [{prop: "Code", name: "Code", embedded: false, exported: true, typ: $String, tag: ""}, {prop: "Words", name: "Words", embedded: false, exported: true, typ: sliceType$5, tag: ""}, {prop: "BackgroundColor", name: "BackgroundColor", embedded: false, exported: true, typ: $String, tag: ""}, {prop: "TextColor", name: "TextColor", embedded: false, exported: true, typ: $String, tag: ""}]);
+	Config.init("overword", [{prop: "WordSets", name: "WordSets", embedded: false, exported: true, typ: sliceType$2, tag: ""}, {prop: "HighlightClass", name: "HighlightClass", embedded: false, exported: true, typ: $String, tag: ""}, {prop: "DebounceTime", name: "DebounceTime", embedded: false, exported: true, typ: $Int, tag: ""}, {prop: "gmc", name: "gmc", embedded: false, exported: false, typ: ptrType$3, tag: ""}]);
+	Match.init("", [{prop: "Start", name: "Start", embedded: false, exported: true, typ: $Int, tag: ""}, {prop: "End", name: "End", embedded: false, exported: true, typ: $Int, tag: ""}, {prop: "Word", name: "Word", embedded: false, exported: true, typ: $String, tag: ""}, {prop: "WordSet", name: "WordSet", embedded: false, exported: true, typ: WordSet, tag: ""}]);
 	$init = function() {
 		$pkg.$init = function() {};
 		/* */ var $f, $c = false, $s = 0, $r; if (this !== undefined && this.$blk !== undefined) { $f = this; $c = true; $s = $f.$s; $r = $f.$r; } s: while (true) { switch ($s) { case 0:
@@ -6883,10 +7305,18 @@ $packages["overword"] = (function() {
 		$r = sort.$init(); /* */ $s = 2; case 2: if($c) { $c = false; $r = $r.$blk(); } if ($r && $r.$blk !== undefined) { break s; }
 		$r = strings.$init(); /* */ $s = 3; case 3: if($c) { $c = false; $r = $r.$blk(); } if ($r && $r.$blk !== undefined) { break s; }
 		highlighter = ptrType.nil;
-		if ($pkg === $mainPkg) {
-			main();
+		body = null;
+		unsafeWindow = null;
+		console = null;
+		gmConfig = null;
+		predefinedSets = new sliceType([$clone(new structType.ptr("yellow", "\xD0\x96\xD1\x91\xD0\xBB\xD1\x82\xD1\x8B\xD0\xB9", "yellow", "black"), structType), $clone(new structType.ptr("red", "\xD0\x9A\xD1\x80\xD0\xB0\xD1\x81\xD0\xBD\xD1\x8B\xD0\xB9", "red", "white"), structType), $clone(new structType.ptr("orange", "\xD0\x9E\xD1\x80\xD0\xB0\xD0\xBD\xD0\xB6\xD0\xB5\xD0\xB2\xD1\x8B\xD0\xB9", "orange", "black"), structType), $clone(new structType.ptr("green", "\xD0\x97\xD0\xB5\xD0\xBB\xD1\x91\xD0\xBD\xD1\x8B\xD0\xB9", "green", "white"), structType), $clone(new structType.ptr("blue", "\xD0\xA1\xD0\xB8\xD0\xBD\xD0\xB8\xD0\xB9", "blue", "white"), structType)]);
+		init();
+		/* */ if ($pkg === $mainPkg) { $s = 4; continue; }
+		/* */ $s = 5; continue;
+		/* if ($pkg === $mainPkg) { */ case 4:
+			$r = main(); /* */ $s = 6; case 6: if($c) { $c = false; $r = $r.$blk(); } if ($r && $r.$blk !== undefined) { break s; }
 			$mainFinished = true;
-		}
+		/* } */ case 5:
 		/* */ } return; } if ($f === undefined) { $f = { $blk: $init }; } $f.$s = $s; $f.$r = $r; return $f;
 	};
 	$pkg.$init = $init;
@@ -6900,4 +7330,3 @@ $go($mainPkg.$init, []);
 $flushConsole();
 
 }).call(this);
-//# sourceMappingURL=overword.js.map

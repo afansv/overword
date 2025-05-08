@@ -7,63 +7,75 @@ import (
 	"github.com/gopherjs/gopherjs/js"
 )
 
-type Config struct {
-	Words          []string
-	HighlightClass string
-	DebounceTime   int
-}
-
 type Highlighter struct {
-	config     Config
+	config     *Config
 	observer   *js.Object
 	debounceID *js.Object
 }
 
-var highlighter *Highlighter
-
 func main() {
-	js.Global.Set("initHighlighter", initHighlighter)
-	js.Global.Set("stopHighlighter", stopHighlighter)
-	js.Global.Call("initHighlighter") // запуск по умолчанию
+	initHighlighter()
 }
 
-func initHighlighter(wordsObj *js.Object) {
-	var words []string
-	if wordsObj != nil && wordsObj != js.Undefined {
-		for i := 0; i < wordsObj.Length(); i++ {
-			word := wordsObj.Index(i).String()
-			if word != "" {
-				words = append(words, word)
-			}
-		}
-	}
-	if len(words) == 0 {
-		words = []string{"важно", "срочно", "внимание"}
-	}
-
-	config := Config{
-		Words:          words,
+func initHighlighter() {
+	config := &Config{
 		HighlightClass: "highlightClass",
 		DebounceTime:   1000,
 	}
-
+	config.Register()
+	config.Load()
+	config.AddListener(func() {
+		highlighter.parseAndHighlight(body, true)
+	})
 	highlighter = &Highlighter{config: config}
 	addDefaultCSS(config.HighlightClass)
-	highlighter.searchAndHighlight(js.Global.Get("document").Get("body"))
+	highlighter.parseAndHighlight(body, false)
 	highlighter.observeDOMChanges()
 }
 
 func (h *Highlighter) observeDOMChanges() {
 	cb := js.MakeFunc(func(this *js.Object, args []*js.Object) interface{} {
-		h.debounceHighlight()
+		records := args[0]
+		for i := 0; i < records.Length(); i++ {
+			record := records.Index(i)
+			if containsHighlightClass(record.Get("addedNodes"), h.config.HighlightClass) {
+				continue
+			}
+			if containsHighlightClass(record.Get("removedNodes"), h.config.HighlightClass) {
+				continue
+			}
+			h.debounceHighlight()
+			break
+		}
 		return nil
 	})
 	h.observer = js.Global.Get("MutationObserver").New(cb)
-	h.observer.Call("observe", js.Global.Get("document").Get("body"), map[string]interface{}{
+	h.observer.Call("observe", body, map[string]interface{}{
 		"childList":     true,
 		"subtree":       true,
 		"characterData": true,
 	})
+}
+
+func containsHighlightClass(nodeList *js.Object, className string) bool {
+	for i := 0; i < nodeList.Length(); i++ {
+		node := nodeList.Index(i)
+		if node.Get("classList") != js.Undefined && node.Get("classList").Call("contains", className).Bool() {
+			return true
+		}
+		if hasDescendantWithClass(node, className) {
+			return true
+		}
+	}
+	return false
+}
+
+func hasDescendantWithClass(node *js.Object, className string) bool {
+	if node.Get("querySelector") == js.Undefined {
+		return false
+	}
+	found := node.Call("querySelector", "."+className)
+	return found != nil && found != js.Undefined
 }
 
 func (h *Highlighter) debounceHighlight() {
@@ -71,7 +83,7 @@ func (h *Highlighter) debounceHighlight() {
 		js.Global.Get("clearTimeout").Invoke(h.debounceID)
 	}
 	h.debounceID = js.Global.Get("setTimeout").Invoke(func() {
-		h.searchAndHighlight(js.Global.Get("document").Get("body"))
+		h.parseAndHighlight(body, true)
 	}, h.config.DebounceTime)
 }
 
@@ -99,7 +111,10 @@ func (h *Highlighter) collectTextNodes(node *js.Object, result *[]*js.Object) {
 	}
 }
 
-func (h *Highlighter) searchAndHighlight(root *js.Object) {
+func (h *Highlighter) parseAndHighlight(root *js.Object, clear bool) {
+	if clear {
+		removeHighlights(h.config.HighlightClass)
+	}
 	var textNodes []*js.Object
 	h.collectTextNodes(root, &textNodes)
 
@@ -118,26 +133,30 @@ func (h *Highlighter) highlightTextNode(textNode *js.Object) {
 		Start int
 		End   int
 		Word  string
+
+		WordSet WordSet
 	}
 	var matches []Match
 	lowerText := strings.ToLower(text)
 
-	for _, word := range h.config.Words {
-		word = strings.TrimSpace(word)
-		if word == "" {
-			continue
-		}
-		wordLower := strings.ToLower(word)
-		idx := 0
-		for {
-			pos := strings.Index(lowerText[idx:], wordLower)
-			if pos == -1 {
-				break
+	for _, ws := range h.config.WordSets {
+		for _, word := range ws.Words {
+			word = strings.TrimSpace(word)
+			if word == "" {
+				continue
 			}
-			start := idx + pos
-			end := start + len(word)
-			matches = append(matches, Match{Start: start, End: end, Word: text[start:end]})
-			idx = end
+			wordLower := strings.ToLower(word)
+			idx := 0
+			for {
+				pos := strings.Index(lowerText[idx:], wordLower)
+				if pos == -1 {
+					break
+				}
+				start := idx + pos
+				end := start + len(word)
+				matches = append(matches, Match{Start: start, End: end, Word: text[start:end], WordSet: *ws})
+				idx = end
+			}
 		}
 	}
 
@@ -149,7 +168,6 @@ func (h *Highlighter) highlightTextNode(textNode *js.Object) {
 		return matches[i].Start < matches[j].Start
 	})
 
-	// Объединение перекрывающихся подсветок
 	var merged []Match
 	for _, m := range matches {
 		if len(merged) == 0 || m.Start >= merged[len(merged)-1].End {
@@ -171,6 +189,8 @@ func (h *Highlighter) highlightTextNode(textNode *js.Object) {
 		}
 		span := doc.Call("createElement", "span")
 		span.Get("classList").Call("add", h.config.HighlightClass)
+		span.Get("style").Set("background-color", m.WordSet.BackgroundColor)
+		span.Get("style").Set("color", m.WordSet.TextColor)
 		span.Set("textContent", text[m.Start:m.End])
 		fragment.Call("appendChild", span)
 		prev = m.End
@@ -192,15 +212,8 @@ func addDefaultCSS(className string) {
 	}
 	style := js.Global.Get("document").Call("createElement", "style")
 	style.Set("id", styleID)
-	style.Set("textContent", `.`+className+` { background-color: yellow; color: black; }`)
+	style.Set("textContent", `.`+className+` { }`)
 	js.Global.Get("document").Get("head").Call("appendChild", style)
-}
-
-func stopHighlighter() {
-	if highlighter != nil && highlighter.observer != nil {
-		highlighter.observer.Call("disconnect")
-	}
-	removeHighlights("highlightClass")
 }
 
 func removeHighlights(className string) {
@@ -213,6 +226,7 @@ func removeHighlights(className string) {
 			text := highlight.Get("textContent")
 			textNode := doc.Call("createTextNode", text)
 			parent.Call("replaceChild", textNode, highlight)
+			parent.Call("normalize")
 		}
 	}
 }

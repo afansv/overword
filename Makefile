@@ -3,7 +3,7 @@ toolset:
 	bd install --clean
 
 build:
-	bd exec gopherjs build
-	cat header.txt overword.js > overword_tmp.js
-	mv overword_tmp.js dist/overword.js
+	bd exec gopherjs build --source_map=false
+	cat header.js overword.js > overword_tmp.js
+	mv overword_tmp.js dist/overword.user.js
 	rm overword.js
